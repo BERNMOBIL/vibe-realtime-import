@@ -2,14 +2,7 @@ package ch.bernmobil.vibe.realtimedata;
 
 import java.net.MalformedURLException;
 import javax.sql.DataSource;
-import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
-import org.springframework.batch.core.configuration.annotation.DefaultBatchConfigurer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,27 +70,6 @@ public class SpringConfig {
     @Bean("JobRepositoryInitializer")
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource) throws MalformedURLException {
         return dataSourceInitializer(dataSource, dropBatchTables, createBatchSchema);
-    }
-
-    @Bean
-    public JobLauncher getJobLauncher() throws Exception {
-        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-        jobLauncher.setJobRepository(getJobRepository());
-        jobLauncher.afterPropertiesSet();
-        return jobLauncher;
-    }
-
-    @Bean
-    public BatchConfigurer configurer(DataSource dataSource){
-        return new DefaultBatchConfigurer(dataSource);
-    }
-
-    private JobRepository getJobRepository() throws Exception {
-        JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-        factory.setDataSource(staticDataSource());
-        factory.setTransactionManager(new ResourcelessTransactionManager());
-        factory.afterPropertiesSet();
-        return factory.getObject();
     }
 
     private DataSource createDataSource(String driverClassName, String url) {

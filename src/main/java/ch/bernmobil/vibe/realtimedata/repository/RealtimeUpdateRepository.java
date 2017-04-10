@@ -19,68 +19,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
+//@Component
+//@ComponentScan
 public class RealtimeUpdateRepository {
 
     private static List<ScheduleUpdate> scheduleUpdates = null;
 
-    private final JdbcTemplate staticDataTemplate;
-    private final JdbcTemplate mapperTemplate;
-    public RealtimeUpdateRepository(DataSource staticDataSource, DataSource mapperDataSource) {
-        staticDataTemplate = new JdbcTemplate(staticDataSource);
+    private DataSource mapperDataSource;
+    private DataSource staticDataSource;
+
+    @Autowired
+    public void setMapperDataSource(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
+        this.mapperDataSource = mapperDataSource;
         mapperTemplate = new JdbcTemplate(mapperDataSource);
+
     }
 
+    @Autowired
+    public void setStaticDataSource(@Qualifier("StaticDataSource") DataSource staticDataSource) {
+        this.staticDataSource = staticDataSource;
+        staticDataTemplate = new JdbcTemplate(staticDataSource);
+    }
+
+    private JdbcTemplate staticDataTemplate;
+    private JdbcTemplate mapperTemplate;
+
     public List<ScheduleUpdate> extractScheduleUpdates(List<FeedEntity> feedEntities) {
-        List<ScheduleUpdate> scheduleUpdates = new ArrayList<>();
-        Map<String, StopTimeUpdate> validStopTimeUpdates = new HashMap<>();
-
-        String query = "SELECT * FROM schedule WHERE ";
-
-        for (FeedEntity feedEntity : feedEntities) {
-            TripUpdate tripUpdate = feedEntity.getTripUpdate();
-
-            String gtfsTripId = tripUpdate.getTrip().getTripId();
-
-            for(StopTimeUpdate stopTimeUpdate : tripUpdate.getStopTimeUpdateList()) {
-                String gtfsStopId = stopTimeUpdate.getStopId();
-
-                //TODO: Remove this mock data.
-                gtfsTripId = "38_000827_11_90075_94201_15:59_16:13";
-                gtfsStopId = "90075_0";
-                //END Mock Data
-
-                Integer journeyId = JourneyMapper.getIdByGtfsTripId(gtfsTripId);
-                Integer stopId = StopMapper.getIdByGtfsId(gtfsStopId);
-                if(journeyId == null || stopId == null) {
-                    continue;
-                }
-
-                validStopTimeUpdates.put(":journey:"+journeyId+":stop:"+stopId, stopTimeUpdate);
-                query += "journey = " + journeyId + " AND stop = " + stopId + " OR ";
-            }
-        }
-        query = query.substring(0, query.length()-4);
-
-        if(!validStopTimeUpdates.isEmpty()) {
-            for (Map row : staticDataTemplate.queryForList(query)) {
-                StopTimeUpdate stopTimeUpdate = validStopTimeUpdates.get(":journey:"+row.get("journey")+":stop:"+row.get("stop"));
-                ScheduleUpdate scheduleUpdate = new ScheduleUpdate();
-                scheduleUpdate.setActualDeparture(parseUpdateTime(stopTimeUpdate.getDeparture().getTime()));
-                scheduleUpdate.setActualArrival(parseUpdateTime(stopTimeUpdate.getArrival().getTime()));
-                scheduleUpdate.setSchedule((Integer)row.get("id"));
-                scheduleUpdates.add(scheduleUpdate);
-            }
-        }
-
-        return scheduleUpdates;
+            return new ArrayList<>();
     }
 
 
     public List<ScheduleUpdate> getScheduleUpdates() throws Exception {
         if(scheduleUpdates == null) {
             List<FeedEntity> feedEntities = loadRealtimeUpdates();
+
+
             JourneyMapper.loadMappings(mapperTemplate);
             StopMapper.loadMappings(mapperTemplate);
             scheduleUpdates = extractScheduleUpdates(feedEntities);
