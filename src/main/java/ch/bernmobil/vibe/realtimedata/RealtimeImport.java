@@ -6,11 +6,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-//@EnableAutoConfiguration
+@EnableAutoConfiguration
 @ComponentScan
 public class RealtimeImport {
 
     public static void main(String[] args) {
-        SpringApplication.run(RealtimeImport.class, args);
+        SpringApplication
+            .run(RealtimeImport.class, args)
+            .close();
     }
 }

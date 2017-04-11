@@ -1,8 +1,6 @@
 package ch.bernmobil.vibe.realtimedata;
 
-import java.net.MalformedURLException;
 import javax.sql.DataSource;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,45 +15,30 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 @Configuration
-@EnableBatchProcessing
 @PropertySource("classpath:/application.properties")
 public class SpringConfig {
 
-    @Value("clean-previous-realtime-updates.sql")
+    @Value("classpath:/clean-previous-realtime-updates.sql")
     private Resource cleanPreviousUpdatesScript;
-
-    @Value("org/springframework/batch/core/schema-drop-sqlite.sql")
-    private Resource dropBatchTables;
-
-    @Value("org/springframework/batch/core/schema-sqlite.sql")
-    private Resource createBatchSchema;
 
     @Autowired
     private Environment environment;
 
-    @Primary
-    @Bean
-    public DataSource batchDataSource() {
-        return createDataSource(
-            environment.getProperty("bernmobil.static.batch.driver"),
-            environment.getProperty("bernmobil.static.batch.datasource")
-        );
-    }
-
     @Bean("StaticDataSource")
     public DataSource staticDataSource() {
         return createDataSource(
-            environment.getProperty("bernmobil.static.datasource.driver"),
+            "org.postgresql.Driver",
             environment.getProperty("bernmobil.static.datasource.url"),
             environment.getProperty("bernmobil.static.datasource.username"),
             environment.getProperty("bernmobil.static.datasource.password")
         );
     }
 
+    @Primary
     @Bean("MapperDataSource")
     public DataSource mapperDataSource() {
         return createDataSource(
-            environment.getProperty("bernmobil.mappings.datasource.driver"),
+            "org.postgresql.Driver",
             environment.getProperty("bernmobil.mappings.datasource.url"),
             environment.getProperty("bernmobil.mappings.datasource.username"),
             environment.getProperty("bernmobil.mappings.datasource.password")
@@ -67,12 +50,7 @@ public class SpringConfig {
         return dataSourceInitializer(dataSource, cleanPreviousUpdatesScript);
     }
 
-    @Bean("JobRepositoryInitializer")
-    public DataSourceInitializer dataSourceInitializer(DataSource dataSource) throws MalformedURLException {
-        return dataSourceInitializer(dataSource, dropBatchTables, createBatchSchema);
-    }
-
-    private DataSource createDataSource(String driverClassName, String url) {
+        private DataSource createDataSource(String driverClassName, String url) {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl(url);
@@ -88,15 +66,12 @@ public class SpringConfig {
 
     private DataSourceInitializer dataSourceInitializer(DataSource dataSource, Resource... sqlScripts) {
         ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-
         for(Resource resource : sqlScripts){
             databasePopulator.addScript(resource);
         }
-
         DataSourceInitializer initializer = new DataSourceInitializer();
         initializer.setDataSource(dataSource);
         initializer.setDatabasePopulator(databasePopulator);
-
         return initializer;
     }
 }

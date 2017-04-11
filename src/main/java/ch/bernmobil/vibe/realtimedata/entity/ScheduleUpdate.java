@@ -1,18 +1,21 @@
 package ch.bernmobil.vibe.realtimedata.entity;
 
 import java.sql.Time;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
 
 public class ScheduleUpdate {
     private Time actualArrival;
     private Time actualDeparture;
     private long schedule;
 
-    public void setActualArrival(Time actualArrival) {
+    public ScheduleUpdate(Time actualArrival, Time actualDeparture, long schedule) {
         this.actualArrival = actualArrival;
-    }
-
-    public void setActualDeparture(Time actualDeparture) {
         this.actualDeparture = actualDeparture;
+        this.schedule = schedule;
     }
 
     public void setSchedule(long schedule) { this.schedule = schedule; }
@@ -27,5 +30,18 @@ public class ScheduleUpdate {
 
     public long getSchedule() {
         return schedule;
+    }
+
+    public static ScheduleUpdate convert(ScheduleUpdateInformation updateInformation) {
+        return new ScheduleUpdate(
+            parseUpdateTime(updateInformation.getStopTimeUpdate().getArrival().getTime()),
+            parseUpdateTime(updateInformation.getStopTimeUpdate().getDeparture().getTime()),
+            updateInformation.getScheduleId()
+        );
+    }
+
+    private static Time parseUpdateTime(Long timestamp) {
+        return timestamp == 0 ? null : Time.valueOf(
+            LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.systemDefault()).toLocalTime());
     }
 }
