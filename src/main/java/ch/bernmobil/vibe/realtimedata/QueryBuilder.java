@@ -62,6 +62,10 @@ public class QueryBuilder {
             return new Predicate(left.toString() + " = " + right.toString());
         }
 
+        public static Predicate like(Object left, Object right) {
+            return new Predicate(left.toString() + " LIKE '" + right.toString() + "'");
+        }
+
         public static Predicate joinAnd(List<Predicate> predicates) {
             return Join(" AND ", predicates);
         }

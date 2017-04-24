@@ -45,7 +45,10 @@ public class ScheduleRepository {
 
     public void addScheduleId(List<ScheduleUpdateInformation> scheduleUpdateInformations) {
         for(ScheduleUpdateInformation info : scheduleUpdateInformations) {
-            info.setScheduleId(get(info.getJourneyId(), info.getStopId()).getId());
+            Schedule schedule = get(info.getJourneyId(), info.getStopId());
+            if(schedule != null) {
+                info.setScheduleId(schedule.getId());
+            }
         }
     }
 }
