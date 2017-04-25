@@ -15,7 +15,6 @@ import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 @Configuration
-@PropertySource("classpath:/application.properties")
 public class SpringConfig {
 
     @Value("classpath:/clean-previous-realtime-updates.sql")
@@ -28,9 +27,9 @@ public class SpringConfig {
     public DataSource staticDataSource() {
         return createDataSource(
             "org.postgresql.Driver",
-            environment.getProperty("bernmobil.static.datasource.url"),
-            environment.getProperty("bernmobil.static.datasource.username"),
-            environment.getProperty("bernmobil.static.datasource.password")
+            environment.getProperty("spring.datasource.url"),
+            environment.getProperty("spring.datasource.username"),
+            environment.getProperty("spring.datasource.password")
         );
     }
 
@@ -39,9 +38,9 @@ public class SpringConfig {
     public DataSource mapperDataSource() {
         return createDataSource(
             "org.postgresql.Driver",
-            environment.getProperty("bernmobil.mappings.datasource.url"),
-            environment.getProperty("bernmobil.mappings.datasource.username"),
-            environment.getProperty("bernmobil.mappings.datasource.password")
+            environment.getProperty("bernmobil.mappingrepository.datasource.url"),
+            environment.getProperty("bernmobil.mappingrepository.datasource.username"),
+            environment.getProperty("bernmobil.mappingrepository.datasource.password")
         );
     }
 

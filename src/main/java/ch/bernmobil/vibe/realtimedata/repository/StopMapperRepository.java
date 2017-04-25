@@ -1,12 +1,14 @@
-package ch.bernmobil.vibe.realtimedata.Repository;
+package ch.bernmobil.vibe.realtimedata.repository;
 
 import ch.bernmobil.vibe.realtimedata.QueryBuilder;
 import ch.bernmobil.vibe.realtimedata.QueryBuilder.Predicate;
 import ch.bernmobil.vibe.realtimedata.UpdateManager;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
+
+import ch.bernmobil.vibe.realtimedata.contract.StopMapperContract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,25 +20,24 @@ public class StopMapperRepository {
     private static JdbcTemplate jdbcTemplate;
     private UpdateManager updateManager;
 
-    public Integer getIdByGtfsId(String gtfsId) {
-        return mappings.get(gtfsId);
+    public Optional<Integer> getIdByGtfsId(String gtfsId) {
+        return Optional.ofNullable(mappings.get(gtfsId));
     }
 
-    public StopMapperRepository(@Qualifier("MapperDataSource")DataSource mapperDataSource) {
+    @Autowired
+    public StopMapperRepository(@Qualifier("MapperDataSource")DataSource mapperDataSource, UpdateManager updateManager) {
         jdbcTemplate = new JdbcTemplate(mapperDataSource);
-        updateManager = new UpdateManager(mapperDataSource);
-        load();
+        this.updateManager = updateManager;
     }
 
-    private void load() {
+    public void load() {
         String query = new QueryBuilder()
-            .Select("stop_mapper")
-            .Where(Predicate.equals("update", "'" + updateManager.getLatestUpdateTimestamp() + "'"))
+            .select(StopMapperContract.TABLE_NAME)
+            .where(Predicate.equals(StopMapperContract.UPDATE, String.format("'%s'", UpdateManager.getLatestUpdateTimestamp())))
             .getQuery();
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
-        for (Map row : rows) {
-            mappings.put((String)row.get("gtfs_id"), (Integer)row.get("id"));
+        for (Map row : jdbcTemplate.queryForList(query)) {
+            mappings.put((String)row.get(StopMapperContract.GTFS_ID), (Integer)row.get(StopMapperContract.ID));
         }
     }
 

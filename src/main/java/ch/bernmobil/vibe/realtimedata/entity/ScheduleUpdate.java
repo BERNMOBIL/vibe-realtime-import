@@ -32,6 +32,7 @@ public class ScheduleUpdate {
         return schedule;
     }
 
+    //TODO: beautify
     public static ScheduleUpdate convert(ScheduleUpdateInformation updateInformation) {
         return new ScheduleUpdate(
             parseUpdateTime(updateInformation.getStopTimeUpdate().getArrival().getTime()),

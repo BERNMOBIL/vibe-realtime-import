@@ -8,16 +8,17 @@ public class ScheduleUpdateInformation {
     private int stopId;
     private int scheduleId;
 
-    public ScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate) {
+    public ScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate, int journeyId, int stopId) {
         this.stopTimeUpdate = stopTimeUpdate;
+        this.journeyId = journeyId;
+        this.stopId = stopId;
     }
 
     public StopTimeUpdate getStopTimeUpdate() {
         return stopTimeUpdate;
     }
 
-    public void setStopTimeUpdate(
-        StopTimeUpdate stopTimeUpdate) {
+    public void setStopTimeUpdate(StopTimeUpdate stopTimeUpdate) {
         this.stopTimeUpdate = stopTimeUpdate;
     }
 

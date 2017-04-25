@@ -12,7 +12,6 @@ public class RealtimeImport {
 
     public static void main(String[] args) {
         SpringApplication
-            .run(RealtimeImport.class, args)
-            .close();
+            .run(RealtimeImport.class, args);
     }
 }

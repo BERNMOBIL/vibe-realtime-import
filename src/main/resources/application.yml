@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vibe
+    username: vibe
+    password: vibe
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+bernmobil:
+  mappingrepository:
+    datasource:
+      url: jdbc:postgresql://localhost:5432/mappings
+      username: vibe
+      password: vibe
+  realtime-source:
+    url: https://wp-test.bernmobil.ch/gtfs/827/realtime?apikey=b4059f45-9b52-4511-y68f-0fdfd0fa11c1
