@@ -47,14 +47,18 @@ public class ImportRunner {
 
     @Scheduled(fixedRate = 30 * 1000)
     public void run() throws Exception {
+        logger.info("Start Realtime Update - load static data");
         scheduleRepository.load();
         stopMapperRepository.load();
         journeyMapperRepository.load();
+        logger.info("Load updates");
         List<FeedEntity> feedEntities = realtimeUpdateRepository.getFeedEntities();
         List<ScheduleUpdateInformation> updateInformations = fetchScheduleUpdateInformations(feedEntities);
+        logger.info("Build and save updates");
         scheduleRepository.addScheduleId(updateInformations);
         List<ScheduleUpdate> scheduleUpdates = convert(updateInformations);
         scheduleUpdateRepository.save(scheduleUpdates);
+        logger.info("Finish Realtime Update");
     }
 
     public List<ScheduleUpdateInformation> fetchScheduleUpdateInformations(List<FeedEntity> feedEntities) {
