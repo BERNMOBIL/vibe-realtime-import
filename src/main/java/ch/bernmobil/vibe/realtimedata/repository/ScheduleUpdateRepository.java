@@ -23,9 +23,12 @@ public class ScheduleUpdateRepository {
     public ScheduleUpdateRepository(@Qualifier("StaticDataSource")DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
         insertQuery = new PreparedStatement()
-            .insert(ScheduleUpdateContract.TABLE_NAME, ScheduleUpdateContract.COLUMNS)
+            .insert(ScheduleUpdateContract.TABLE_NAME,
+                    new String[]{ScheduleUpdateContract.SCHEDULE,
+                            ScheduleUpdateContract.ACTUAL_ARRIVAL,
+                            ScheduleUpdateContract.ACTUAL_DEPARTURE})
             .getQuery();
-        insertTypes = new int[] {Types.TIME, Types.TIME, Types.INTEGER};
+        insertTypes = new int[] {Types.INTEGER, Types.TIME, Types.TIME};
 
     }
 
@@ -33,9 +36,9 @@ public class ScheduleUpdateRepository {
         List<Object[]> newScheduleUpdates = new ArrayList<>(scheduleUpdates.size());
         for(ScheduleUpdate scheduleUpdate : scheduleUpdates) {
             newScheduleUpdates.add(new Object[]{
+                scheduleUpdate.getSchedule(),
                 scheduleUpdate.getActualArrival(),
-                scheduleUpdate.getActualDeparture(),
-                scheduleUpdate.getSchedule()
+                scheduleUpdate.getActualDeparture()
             });
         }
         jdbcTemplate.batchUpdate(insertQuery, newScheduleUpdates, insertTypes);
