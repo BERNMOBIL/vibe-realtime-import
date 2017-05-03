@@ -75,7 +75,7 @@ public class ImportRunner {
                 if(journeyId.isPresent() && stopId.isPresent()) {
                     validStopTimeUpdates.add(new ScheduleUpdateInformation(stopTimeUpdate, journeyId.get(), stopId.get()));
                 } else {
-                    logger.warn("Update not found -> TripId: " + gtfsTripId + " -- StopId: " + gtfsStopId);
+                    logger.warn(String.format("No matching entry found for TripId: '%s' and StopId: '%s'", gtfsTripId, gtfsStopId));
                 }
             }
         }
