@@ -1,21 +1,23 @@
 package ch.bernmobil.vibe.realtimedata.entity;
 
-public class Schedule {
-    private int id;
-    private int journeyId;
-    private int stopId;
+import java.util.UUID;
 
-    public Schedule(int id, int journeyId, int stopId) {
+public class Schedule {
+    private UUID id;
+    private UUID journeyId;
+    private UUID stopId;
+
+    public Schedule(UUID id, UUID journeyId, UUID stopId) {
         this.id = id;
         this.journeyId = journeyId;
         this.stopId = stopId;
     }
 
-    public long getJourneyId() {
+    public UUID getJourneyId() {
         return journeyId;
     }
-    public long getStopId() {
+    public UUID getStopId() {
         return stopId;
     }
-    public int getId() { return id; }
+    public UUID getId() { return id; }
 }

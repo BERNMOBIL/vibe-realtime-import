@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -29,6 +30,7 @@ public class ImportRunner {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleUpdateRepository scheduleUpdateRepository;
     private final RealtimeUpdateRepository realtimeUpdateRepository;
+    private final UpdateManager updateManager;
     private static Logger logger = Logger.getLogger(ImportRunner.class);
 
     @Autowired
@@ -37,16 +39,27 @@ public class ImportRunner {
         StopMapperRepository stopMapperRepository,
         ScheduleRepository scheduleRepository,
         ScheduleUpdateRepository scheduleUpdateRepository,
-        RealtimeUpdateRepository realtimeUpdateRepository) {
+        RealtimeUpdateRepository realtimeUpdateRepository,
+        UpdateManager updateManager) {
         this.journeyMapperRepository = journeyMapperRepository;
         this.stopMapperRepository = stopMapperRepository;
         this.scheduleRepository = scheduleRepository;
         this.scheduleUpdateRepository = scheduleUpdateRepository;
         this.realtimeUpdateRepository = realtimeUpdateRepository;
+        this.updateManager = updateManager;
     }
 
     @Scheduled(fixedRate = 30 * 1000)
     public void run() throws Exception {
+        while(!updateManager.checkUpdateCollision()) {
+            logger.info("update collision, try again..");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         logger.info("Start Realtime Update - load static data");
         scheduleRepository.load();
         stopMapperRepository.load();
@@ -69,8 +82,8 @@ public class ImportRunner {
             String gtfsTripId = tripUpdate.getTrip().getTripId();
             for(StopTimeUpdate stopTimeUpdate : tripUpdate.getStopTimeUpdateList()) {
                 String gtfsStopId = stopTimeUpdate.getStopId();
-                Optional<Integer> journeyId = journeyMapperRepository.getIdByGtfsTripId(gtfsTripId);
-                Optional<Integer> stopId = stopMapperRepository.getIdByGtfsId(gtfsStopId);
+                Optional<UUID> journeyId = journeyMapperRepository.getIdByGtfsTripId(gtfsTripId);
+                Optional<UUID> stopId = stopMapperRepository.getIdByGtfsId(gtfsStopId);
                 //TODO: debug logs
                 if(journeyId.isPresent() && stopId.isPresent()) {
                     validStopTimeUpdates.add(new ScheduleUpdateInformation(stopTimeUpdate, journeyId.get(), stopId.get()));

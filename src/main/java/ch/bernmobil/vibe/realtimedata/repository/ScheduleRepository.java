@@ -10,6 +10,7 @@ import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,15 +36,15 @@ public class ScheduleRepository {
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
         schedules = new HashMap<>(rows.size());
         for (Map<String, Object> row : rows) {
-            int journeyId = (int)row.get(ScheduleContract.JOURNEY);
-            int stopId = (int)row.get(ScheduleContract.STOP);
-            int id = (int)row.get(ScheduleContract.ID);
+            UUID journeyId = (UUID)row.get(ScheduleContract.JOURNEY);
+            UUID stopId = (UUID)row.get(ScheduleContract.STOP);
+            UUID id = (UUID)row.get(ScheduleContract.ID);
             Schedule schedule = new Schedule(id, journeyId, stopId);
             schedules.put(schedule.getJourneyId() + ":" + schedule.getStopId(), schedule);
         }
     }
 
-    public Schedule get(int journeyId, int stopId) {
+    public Schedule get(UUID journeyId, UUID stopId) {
         return schedules.get(journeyId + ":" + stopId);
     }
 
