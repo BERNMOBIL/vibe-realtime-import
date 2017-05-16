@@ -6,19 +6,20 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ScheduleUpdate {
     private Time actualArrival;
     private Time actualDeparture;
-    private long schedule;
+    private UUID schedule;
 
-    public ScheduleUpdate(Time actualArrival, Time actualDeparture, long schedule) {
+    public ScheduleUpdate(Time actualArrival, Time actualDeparture, UUID schedule) {
         this.actualArrival = actualArrival;
         this.actualDeparture = actualDeparture;
         this.schedule = schedule;
     }
 
-    public void setSchedule(long schedule) { this.schedule = schedule; }
+    public void setSchedule(UUID schedule) { this.schedule = schedule; }
 
     public Time getActualArrival() {
         return actualArrival;
@@ -28,7 +29,7 @@ public class ScheduleUpdate {
         return actualDeparture;
     }
 
-    public long getSchedule() {
+    public UUID getSchedule() {
         return schedule;
     }
 

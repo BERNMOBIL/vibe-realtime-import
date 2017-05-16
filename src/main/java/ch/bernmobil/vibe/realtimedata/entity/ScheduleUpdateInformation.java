@@ -1,14 +1,15 @@
 package ch.bernmobil.vibe.realtimedata.entity;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import java.util.UUID;
 
 public class ScheduleUpdateInformation {
     private StopTimeUpdate stopTimeUpdate;
-    private int journeyId;
-    private int stopId;
-    private int scheduleId;
+    private UUID journeyId;
+    private UUID stopId;
+    private UUID scheduleId;
 
-    public ScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate, int journeyId, int stopId) {
+    public ScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate, UUID journeyId, UUID stopId) {
         this.stopTimeUpdate = stopTimeUpdate;
         this.journeyId = journeyId;
         this.stopId = stopId;
@@ -22,27 +23,27 @@ public class ScheduleUpdateInformation {
         this.stopTimeUpdate = stopTimeUpdate;
     }
 
-    public int getJourneyId() {
+    public UUID getJourneyId() {
         return journeyId;
     }
 
-    public void setJourneyId(int journeyId) {
+    public void setJourneyId(UUID journeyId) {
         this.journeyId = journeyId;
     }
 
-    public int getStopId() {
+    public UUID getStopId() {
         return stopId;
     }
 
-    public void setStopId(int stopId) {
+    public void setStopId(UUID stopId) {
         this.stopId = stopId;
     }
 
-    public int getScheduleId() {
+    public UUID getScheduleId() {
         return scheduleId;
     }
 
-    public void setScheduleId(int scheduleId) {
+    public void setScheduleId(UUID scheduleId) {
         this.scheduleId = scheduleId;
     }
 }

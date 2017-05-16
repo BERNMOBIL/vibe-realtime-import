@@ -20,19 +20,24 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder insert(String table, String[] fields, String[] values) {
+    public QueryBuilder insert(String table, String[] fields, String[] values, int numRows) {
         String fieldSeperator = ", ";
         query = "INSERT INTO " + table + "(";
         for(String field : fields) {
             query += field + fieldSeperator;
         }
         query = query.substring(0, query.length() - fieldSeperator.length());
-        query += ") VALUES(";
-        for(String value : values) {
-            query += value + fieldSeperator;
+        query += ") VALUES ";
+        for(int i = 0; i < numRows; i++) {
+            query += "(";
+            for(String value : values) {
+                query += value + fieldSeperator;
+            }
+            query = query.substring(0, query.length() - fieldSeperator.length());
+            query += ")";
+            query += fieldSeperator;
         }
         query = query.substring(0, query.length() - fieldSeperator.length());
-        query += ")";
         return this;
     }
 
@@ -46,15 +51,30 @@ public class QueryBuilder {
         return this;
     }
 
+    public QueryBuilder orderby(String ordering) {
+        query += " ORDER BY " + ordering;
+        return this;
+    }
+
+    public QueryBuilder limit(String num) {
+        query += " LIMIT " + num;
+        return this;
+    }
+
     public String getQuery() {
         return query;
     }
 
     public static class PreparedStatement {
-        public QueryBuilder insert(String table, String[] fields) {
+        public QueryBuilder Insert(String table, int numRows, String... fields) {
             ArrayList<String> questionMarks = new ArrayList<>();
-            for(int i = 0; i < fields.length; i++){ questionMarks.add("?");}
-            return new QueryBuilder().insert(table, fields, questionMarks.toArray(new String[questionMarks.size()]));
+            for (String field : fields) {
+                questionMarks.add("?");
+            }
+            return new QueryBuilder().insert(table, fields, questionMarks.toArray(new String[questionMarks.size()]), numRows);
+        }
+        public QueryBuilder Insert(String table, String... fields) {
+            return Insert(table, 1, fields);
         }
     }
 
