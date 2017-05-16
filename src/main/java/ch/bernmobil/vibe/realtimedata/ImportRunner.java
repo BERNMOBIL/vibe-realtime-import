@@ -1,6 +1,6 @@
 package ch.bernmobil.vibe.realtimedata;
 
-import ch.bernmobil.vibe.realtimedata.entity.UpdateHistory;
+import ch.bernmobil.vibe.shared.UpdateHistory;
 import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepository;
@@ -8,7 +8,8 @@ import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
-import ch.bernmobil.vibe.realtimedata.repository.UpdateHistoryRepository;
+import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
+import ch.bernmobil.vibe.shared.UpdateManager;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;

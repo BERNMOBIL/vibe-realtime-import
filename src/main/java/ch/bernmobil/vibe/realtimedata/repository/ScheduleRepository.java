@@ -1,13 +1,11 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import ch.bernmobil.vibe.realtimedata.QueryBuilder;
-import ch.bernmobil.vibe.realtimedata.QueryBuilder.Predicate;
-import ch.bernmobil.vibe.realtimedata.UpdateManager;
+import ch.bernmobil.vibe.shared.QueryBuilder;
+import ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
 import ch.bernmobil.vibe.realtimedata.contract.ScheduleContract;
 import ch.bernmobil.vibe.realtimedata.entity.Schedule;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
-import ch.bernmobil.vibe.realtimedata.entity.UpdateHistory;
-import java.sql.Time;
+
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;

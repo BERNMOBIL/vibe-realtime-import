@@ -1,6 +1,9 @@
 package ch.bernmobil.vibe.realtimedata;
 
 import javax.sql.DataSource;
+
+import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
+import ch.bernmobil.vibe.shared.UpdateManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +23,6 @@ public class SpringConfig {
     @Value("classpath:/clean-previous-realtime-updates.sql")
     private Resource cleanPreviousUpdatesScript;
 
-    @Autowired
     private Environment environment;
 
     @Bean("StaticDataSource")
@@ -44,6 +46,17 @@ public class SpringConfig {
         );
     }
 
+    @Bean
+    public UpdateManager updateManager(@Qualifier("MapperDataSource") DataSource mapperDataSource,
+                                       @Qualifier("StaticDataSource") DataSource postgresDataSource,
+                                       UpdateHistoryRepository updateHistoryRepository) {
+        return new UpdateManager(mapperDataSource, postgresDataSource, updateHistoryRepository);
+    }
+
+    @Bean
+    public UpdateHistoryRepository updateHistoryRepository(@Qualifier("StaticDataSource")DataSource dataSource) {
+        return new UpdateHistoryRepository(dataSource);
+    }
     @Bean("PostgresInitializer")
     public DataSourceInitializer postgresInitializer(@Qualifier("StaticDataSource") DataSource dataSource) {
         return dataSourceInitializer(dataSource, cleanPreviousUpdatesScript);
@@ -72,5 +85,10 @@ public class SpringConfig {
         initializer.setDataSource(dataSource);
         initializer.setDatabasePopulator(databasePopulator);
         return initializer;
+    }
+
+    @Autowired
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 }
