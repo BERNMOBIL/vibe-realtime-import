@@ -19,7 +19,7 @@ public class ScheduleUpdateRepository {
     public ScheduleUpdateRepository(@Qualifier("StaticDataSource")DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
         insertQuery = new PreparedStatement()
-            .insert(ScheduleUpdateContract.TABLE_NAME, ScheduleUpdateContract.COLUMNS)
+            .Insert(ScheduleUpdateContract.TABLE_NAME, ScheduleUpdateContract.COLUMNS)
             .getQuery();
     }
 

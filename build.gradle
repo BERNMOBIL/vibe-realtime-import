@@ -55,6 +55,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-jpa:1.5.2.RELEASE'
     compile 'org.hibernate:hibernate-core:5.2.9.Final'
     compile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.2.4'
+    compile project(':shared')
     runtime 'org.xerial:sqlite-jdbc:3.16.1'
     runtime('org.postgresql:postgresql')
     testCompile('org.springframework.boot:spring-boot-starter-test')
