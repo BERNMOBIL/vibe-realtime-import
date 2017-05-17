@@ -23,20 +23,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 @Component
-public class StopMapperRepository {
-    private HashMap<String, StopMapping> mappings;
-    private static JdbcTemplate jdbcTemplate;
-    private UpdateManager updateManager;
+public class StopMapperRepository extends BaseRepository<StopMapping> {
+
+
+
+    @Autowired
+    public StopMapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
+        super(mapperDataSource, new StopMappingRowMapper());
+    }
 
     public Optional<StopMapping> findByGtfsId(String gtfsId) {
         return Optional.ofNullable(mappings.get(gtfsId));
-    }
-
-    @Autowired
-    public StopMapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource,
-        UpdateManager updateManager) {
-        jdbcTemplate = new JdbcTemplate(mapperDataSource);
-        this.updateManager = updateManager;
     }
 
     public void load(Timestamp updateTimestamp) {
@@ -45,9 +42,7 @@ public class StopMapperRepository {
             .where(Predicate.equals(StopMapperContract.UPDATE, String.format("'%s'", updateTimestamp)))
             .getQuery();
 
-        List<StopMapping> list = jdbcTemplate.query(query, new StopMappingRowMapper());
-        mappings = new HashMap<>(list.size());
-        list.forEach(stopMapping -> mappings.put(stopMapping.getGtfsId(), stopMapping));
+        super.load(query, stopMapping -> mappings.put(stopMapping.getGtfsId(), stopMapping));
     }
 
     private static class StopMappingRowMapper implements RowMapper<StopMapping> {

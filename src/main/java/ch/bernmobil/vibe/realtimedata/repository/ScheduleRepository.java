@@ -1,33 +1,27 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import ch.bernmobil.vibe.shared.QueryBuilder;
 import ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
 import ch.bernmobil.vibe.shared.contract.ScheduleContract;
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
+import ch.bernmobil.vibe.shared.entitiy.Schedule;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import javax.sql.DataSource;
-
-import ch.bernmobil.vibe.shared.entitiy.Schedule;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
 
 @Component
-public class ScheduleRepository {
-    private final JdbcTemplate jdbcTemplate;
-    private Map<String, Schedule> schedules;
+public class ScheduleRepository extends BaseRepository<Schedule> {
+
     public ScheduleRepository(@Qualifier("StaticDataSource") DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        schedules = new HashMap<>();
+        super(dataSource, new ScheduleRowMapper());
     }
 
     public void load(Timestamp updateTimestamp) {
@@ -35,16 +29,13 @@ public class ScheduleRepository {
             .select(ScheduleContract.TABLE_NAME)
             .where(Predicate.equals(ScheduleContract.UPDATE, String.format("'%s'", updateTimestamp)))
             .getQuery();
-
-        List<Schedule> rows = jdbcTemplate.query(query, new ScheduleRowMapper());
-        schedules = new HashMap<>(rows.size());
         //TODO: document
-        rows.forEach(schedule -> schedules.put(concatKey(schedule.getJourney(), schedule.getStop()), schedule));
+        super.load(query, schedule -> mappings.put(concatKey(schedule.getJourney(), schedule.getStop()), schedule));
     }
 
     public void addScheduleId(List<ScheduleUpdateInformation> scheduleUpdateInformationList) {
         for(ScheduleUpdateInformation info : scheduleUpdateInformationList) {
-            Schedule schedule = schedules.get(concatKey(info.getJourneyId(), info.getStopId()));
+            Schedule schedule = mappings.get(concatKey(info.getJourneyId(), info.getStopId()));
             if(schedule != null) {
                 info.setScheduleId(schedule.getId());
             }

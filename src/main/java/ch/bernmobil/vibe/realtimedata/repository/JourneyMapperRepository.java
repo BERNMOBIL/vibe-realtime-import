@@ -22,13 +22,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JourneyMapperRepository {
-    private Map<String, JourneyMapping> mappings;
-    private static JdbcTemplate jdbcTemplate;
+public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
 
     @Autowired
     public JourneyMapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
-        jdbcTemplate = new JdbcTemplate(mapperDataSource);
+        super(mapperDataSource, new JourneyMappingRowMapper());
     }
 
     public Optional<JourneyMapping> findByGtfsTripId(String gtfsTripId) {
@@ -40,14 +38,10 @@ public class JourneyMapperRepository {
             .select(JourneyMapperContract.TABLE_NAME)
             .where(Predicate.equals(JourneyMapperContract.UPDATE, String.format("'%s'", updateTimestamp)))
             .getQuery();
-
-        List<JourneyMapping> list = jdbcTemplate.query(query, new JourneyMappingRowMapper());
-        mappings = new HashMap<>(list.size());
-        list.forEach(journeyMapping -> mappings.put(journeyMapping.getGtfsTripId(), journeyMapping));
-
+        super.load(query, journeyMapping -> mappings.put(journeyMapping.getGtfsTripId(), journeyMapping));
     }
 
-    private class JourneyMappingRowMapper implements RowMapper<JourneyMapping> {
+    private static class JourneyMappingRowMapper implements RowMapper<JourneyMapping> {
 
         @Override
         public JourneyMapping mapRow(ResultSet rs, int rowNum) throws SQLException {
