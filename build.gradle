@@ -50,10 +50,9 @@ repositories {
 
 dependencies {
     compile group: 'com.google.transit', name: 'gtfs-realtime-bindings', version: '0.0.4'
-    compile("org.springframework.boot:spring-boot-starter-web:1.5.2.RELEASE")
-    compile("org.springframework:spring-context:4.3.7.RELEASE")
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa:1.5.2.RELEASE'
+    //compile("org.springframework:spring-context:4.3.7.RELEASE")
     compile project(':shared')
+    compileOnly "org.springframework.boot:spring-boot-configuration-processor"
     runtime 'org.xerial:sqlite-jdbc:3.16.1'
     runtime('org.postgresql:postgresql')
     testCompile('org.springframework.boot:spring-boot-starter-test')

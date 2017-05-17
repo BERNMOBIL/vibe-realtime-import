@@ -1,7 +1,7 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
 import ch.bernmobil.vibe.shared.QueryBuilder.PreparedStatement;
-import ch.bernmobil.vibe.realtimedata.contract.ScheduleUpdateContract;
+import ch.bernmobil.vibe.shared.contract.ScheduleUpdateContract;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import java.util.Collection;
 import java.util.UUID;

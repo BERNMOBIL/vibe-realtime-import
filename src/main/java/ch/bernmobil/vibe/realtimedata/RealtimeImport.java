@@ -11,7 +11,6 @@ import org.springframework.context.annotation.ComponentScan;
 public class RealtimeImport {
 
     public static void main(String[] args) {
-        SpringApplication
-            .run(RealtimeImport.class, args);
+        SpringApplication.run(RealtimeImport.class, args);
     }
 }

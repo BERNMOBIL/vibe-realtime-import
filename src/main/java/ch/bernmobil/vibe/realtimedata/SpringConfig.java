@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
 import ch.bernmobil.vibe.shared.UpdateManager;
+import ch.bernmobil.vibe.shared.UpdateManagerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +14,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+
+import java.time.Duration;
 
 @Configuration
 public class SpringConfig {
@@ -25,7 +29,7 @@ public class SpringConfig {
 
     private Environment environment;
 
-    @Bean("StaticDataSource")
+    @Bean(name = "StaticDataSource")
     public DataSource staticDataSource() {
         return createDataSource(
             "org.postgresql.Driver",
@@ -36,7 +40,7 @@ public class SpringConfig {
     }
 
     @Primary
-    @Bean("MapperDataSource")
+    @Bean(name = "MapperDataSource")
     public DataSource mapperDataSource() {
         return createDataSource(
             "org.postgresql.Driver",
@@ -47,22 +51,30 @@ public class SpringConfig {
     }
 
     @Bean
-    public UpdateManager updateManager(@Qualifier("MapperDataSource") DataSource mapperDataSource,
-                                       @Qualifier("StaticDataSource") DataSource postgresDataSource,
+    public UpdateManager updateManager(@Qualifier("MapperRepository") UpdateManagerRepository mapperRepository,
+                                       @Qualifier("StaticRepository") UpdateManagerRepository staticRepository,
                                        UpdateHistoryRepository updateHistoryRepository) {
-        return new UpdateManager(mapperDataSource, postgresDataSource, updateHistoryRepository);
+        int historySize = environment.getProperty("bernmobil.history.size", Integer.class);
+        Duration timeout = Duration.ofMinutes(environment.getProperty("bernmobil.history.timeout-duration", Long.class));
+        return new UpdateManager(mapperRepository, staticRepository, updateHistoryRepository, historySize, timeout);
+    }
+
+    @Bean(name = "MapperRepository")
+    public UpdateManagerRepository mapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
+        return new UpdateManagerRepository(new JdbcTemplate(mapperDataSource));
+    }
+
+    @Bean(name = "StaticRepository")
+    public UpdateManagerRepository staticRepository(@Qualifier("StaticDataSource") DataSource staticDataSource) {
+        return new UpdateManagerRepository(new JdbcTemplate(staticDataSource));
     }
 
     @Bean
     public UpdateHistoryRepository updateHistoryRepository(@Qualifier("StaticDataSource")DataSource dataSource) {
         return new UpdateHistoryRepository(dataSource);
     }
-    @Bean("PostgresInitializer")
-    public DataSourceInitializer postgresInitializer(@Qualifier("StaticDataSource") DataSource dataSource) {
-        return dataSourceInitializer(dataSource, cleanPreviousUpdatesScript);
-    }
 
-        private DataSource createDataSource(String driverClassName, String url) {
+    private DataSource createDataSource(String driverClassName, String url) {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl(url);
@@ -74,17 +86,6 @@ public class SpringConfig {
         dataSource.setUsername(username);
         dataSource.setPassword(password);
         return dataSource;
-    }
-
-    private DataSourceInitializer dataSourceInitializer(DataSource dataSource, Resource... sqlScripts) {
-        ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
-        for(Resource resource : sqlScripts){
-            databasePopulator.addScript(resource);
-        }
-        DataSourceInitializer initializer = new DataSourceInitializer();
-        initializer.setDataSource(dataSource);
-        initializer.setDatabasePopulator(databasePopulator);
-        return initializer;
     }
 
     @Autowired
