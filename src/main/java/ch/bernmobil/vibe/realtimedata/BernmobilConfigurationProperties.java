@@ -102,4 +102,22 @@ public class BernmobilConfigurationProperties {
             this.timeoutDuration = timeoutDuration;
         }
     }
+
+    @ConfigurationProperties(prefix = "bernmobil.locale")
+    public class Locale {
+
+        /**
+         * The timezone in which the departures are taking place. Refer to {@link java.time.ZoneId}
+         * for information about valid values
+         */
+        private String timezone;
+
+        public String getTimezone() {
+            return timezone;
+        }
+
+        public void setTimezone(String timezone) {
+            this.timezone = timezone;
+        }
+    }
 }

@@ -19,6 +19,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ import org.springframework.stereotype.Service;
 @Service
 @EnableScheduling
 public class ImportRunner {
+    @Value("${bernmobil.locale.timezone}")
+    private String timezone;
     private final Logger logger = Logger.getLogger(ImportRunner.class);
 
     private final JourneyMapperRepository journeyMapperRepository;
@@ -112,7 +115,7 @@ public class ImportRunner {
             if(scheduleUpdates.containsKey(info.getScheduleId())) {
                 logger.warn(String.format("Schedule update with schedule-id %s already exists. It will overwrite any existing updates", info.getScheduleId()));
             }
-            scheduleUpdates.put(info.getScheduleId(), ScheduleUpdate.convert(info));
+            scheduleUpdates.put(info.getScheduleId(), ScheduleUpdate.convert(info, timezone));
         }
         return scheduleUpdates.values();
     }

@@ -16,3 +16,5 @@ bernmobil:
   history:
     size: 2
     timeout-duration: 30
+  locale:
+    timezone: Europe/Paris
