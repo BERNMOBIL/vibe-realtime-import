@@ -1,5 +1,6 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
+import ch.bernmobil.vibe.shared.QueryBuilder;
 import ch.bernmobil.vibe.shared.QueryBuilder.PreparedStatement;
 import ch.bernmobil.vibe.shared.contract.ScheduleUpdateContract;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
@@ -28,5 +29,9 @@ public class ScheduleUpdateRepository {
             jdbcTemplate.update(insertQuery, UUID.randomUUID(), scheduleUpdate.getSchedule(),
                 scheduleUpdate.getActualArrival(), scheduleUpdate.getActualDeparture());
         }
+    }
+
+    public void deleteAll() {
+        jdbcTemplate.update(new QueryBuilder().truncate(ScheduleUpdateContract.TABLE_NAME).getQuery());
     }
 }

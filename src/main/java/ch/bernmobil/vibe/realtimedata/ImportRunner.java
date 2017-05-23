@@ -15,10 +15,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +51,7 @@ public class ImportRunner {
         this.updateHistoryRepository = updateHistoryRepository;
     }
 
-    @Scheduled(fixedRate = 30 * 1000)
+    @Scheduled(fixedDelay = 30 * 1000)
     public void run() throws Exception {
         UpdateHistoryEntry lastSuccessUpdate = updateHistoryRepository.findLastSuccessUpdate();
         if(lastSuccessUpdate == null) {
@@ -65,13 +62,15 @@ public class ImportRunner {
         scheduleRepository.load(lastSuccessUpdate.getTime());
         stopMapperRepository.load(lastSuccessUpdate.getTime());
         journeyMapperRepository.load(lastSuccessUpdate.getTime());
+        logger.info("Delete old schedule updates");
+        scheduleUpdateRepository.deleteAll();
         logger.info("Fetching from Realtime feed");
         List<FeedEntity> feedEntities = realtimeUpdateRepository.findAll();
         logger.debug(String.format("Fetching successful. Found %d entries", feedEntities.size()));
         logger.info("Convert GTFS updates");
         List<ScheduleUpdateInformation> updateInformationList = extractScheduleUpdateInformation(feedEntities);
         scheduleRepository.addScheduleId(updateInformationList);
-        List<ScheduleUpdate> scheduleUpdates = convert(updateInformationList);
+        Collection<ScheduleUpdate> scheduleUpdates = convert(updateInformationList);
         logger.info("Save updates");
         scheduleUpdateRepository.save(scheduleUpdates);
         logger.info("Finish Realtime Update");
@@ -107,11 +106,14 @@ public class ImportRunner {
         return null;
     }
 
-    private List<ScheduleUpdate> convert(List<ScheduleUpdateInformation> scheduleUpdateInformations) {
-        List<ScheduleUpdate> scheduleUpdates = new ArrayList<>();
+    private Collection<ScheduleUpdate> convert(List<ScheduleUpdateInformation> scheduleUpdateInformations) {
+        Map<UUID, ScheduleUpdate> scheduleUpdates = new HashMap<>();
         for(ScheduleUpdateInformation info : scheduleUpdateInformations) {
-            scheduleUpdates.add(ScheduleUpdate.convert(info));
+            if(scheduleUpdates.containsKey(info.getScheduleId())) {
+                logger.warn(String.format("Schedule update with schedule-id %s already exists. It will overwrite any existing updates", info.getScheduleId()));
+            }
+            scheduleUpdates.put(info.getScheduleId(), ScheduleUpdate.convert(info));
         }
-        return scheduleUpdates;
+        return scheduleUpdates.values();
     }
 }
