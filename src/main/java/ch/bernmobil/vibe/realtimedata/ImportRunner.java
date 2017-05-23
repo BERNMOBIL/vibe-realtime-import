@@ -86,7 +86,7 @@ public class ImportRunner {
             numTotalUpdates += tripUpdate.getStopTimeUpdateCount();
 
             tripUpdate.getStopTimeUpdateList()
-                    .parallelStream()
+                    .stream()
                     .map(stopTimeUpdate -> convertToScheduleUpdateInformation(stopTimeUpdate, gtfsTripId))
                     .filter(Objects::nonNull)
                     .forEach(validStopTimeUpdates::add);
