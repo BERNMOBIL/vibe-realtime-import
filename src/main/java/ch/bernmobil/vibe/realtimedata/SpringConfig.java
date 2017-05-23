@@ -8,6 +8,7 @@ import ch.bernmobil.vibe.shared.UpdateManagerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -32,7 +33,7 @@ public class SpringConfig {
     @Bean(name = "StaticDataSource")
     public DataSource staticDataSource() {
         return createDataSource(
-            "org.postgresql.Driver",
+            environment.getProperty("spring.datasource.driver-class-name"),
             environment.getProperty("spring.datasource.url"),
             environment.getProperty("spring.datasource.username"),
             environment.getProperty("spring.datasource.password")
@@ -43,7 +44,7 @@ public class SpringConfig {
     @Bean(name = "MapperDataSource")
     public DataSource mapperDataSource() {
         return createDataSource(
-            "org.postgresql.Driver",
+            environment.getProperty("bernmobil.mappingrepository.datasource.driver-class-name"),
             environment.getProperty("bernmobil.mappingrepository.datasource.url"),
             environment.getProperty("bernmobil.mappingrepository.datasource.username"),
             environment.getProperty("bernmobil.mappingrepository.datasource.password")
@@ -74,18 +75,13 @@ public class SpringConfig {
         return new UpdateHistoryRepository(dataSource);
     }
 
-    private DataSource createDataSource(String driverClassName, String url) {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl(url);
-        return dataSource;
-    }
-
-    private DataSource createDataSource(String driverClassName, String url, String username, String password) {
-        DriverManagerDataSource dataSource = (DriverManagerDataSource) createDataSource(driverClassName, url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
+    private DataSource createDataSource(String driver, String url, String username, String password) {
+        DataSourceBuilder builder = DataSourceBuilder.create();
+        builder.driverClassName(driver);
+        builder.url(url);
+        builder.username(username);
+        builder.password(password);
+        return builder.build();
     }
 
     @Autowired
