@@ -26,6 +26,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @EnableScheduling
 public class ImportRunner {
@@ -85,11 +87,13 @@ public class ImportRunner {
             String gtfsTripId = tripUpdate.getTrip().getTripId();
             numTotalUpdates += tripUpdate.getStopTimeUpdateCount();
 
-            tripUpdate.getStopTimeUpdateList()
+            List<ScheduleUpdateInformation> convertedUpdates =
+                    tripUpdate.getStopTimeUpdateList()
                     .parallelStream()
                     .map(stopTimeUpdate -> convertToScheduleUpdateInformation(stopTimeUpdate, gtfsTripId))
                     .filter(Objects::nonNull)
-                    .forEach(validStopTimeUpdates::add);
+                    .collect(toList());
+            validStopTimeUpdates.addAll(convertedUpdates);
 
         }
         logger.info(String.format("Update Statistic: %d of %d were valid.", validStopTimeUpdates.size(), numTotalUpdates));
