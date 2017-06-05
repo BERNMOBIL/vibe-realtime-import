@@ -32,16 +32,16 @@ public class ScheduleUpdate {
     }
 
     //TODO: beautify
-    public static ScheduleUpdate convert(ScheduleUpdateInformation updateInformation) {
+    public static ScheduleUpdate convert(ScheduleUpdateInformation updateInformation, String timezone) {
         return new ScheduleUpdate(
-            parseUpdateTime(updateInformation.getStopTimeUpdate().getArrival().getTime()),
-            parseUpdateTime(updateInformation.getStopTimeUpdate().getDeparture().getTime()),
+            parseUpdateTime(updateInformation.getStopTimeUpdate().getArrival().getTime(), timezone),
+            parseUpdateTime(updateInformation.getStopTimeUpdate().getDeparture().getTime(), timezone),
             updateInformation.getScheduleId()
         );
     }
 
-    private static Time parseUpdateTime(Long timestamp) {
+    private static Time parseUpdateTime(Long timestamp, String timezone) {
         return timestamp == 0 ? null : Time.valueOf(
-            LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.systemDefault()).toLocalTime());
+            LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.of("Europe/Paris")).toLocalTime());
     }
 }

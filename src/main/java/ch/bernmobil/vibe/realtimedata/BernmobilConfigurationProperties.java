@@ -6,24 +6,6 @@ import java.net.URL;
 
 public class BernmobilConfigurationProperties {
 
-    @ConfigurationProperties(prefix = "bernmobil.jobrepository")
-    public class JobRepository {
-
-        /**
-         * Value of the datasource of the repository where logs of Spring Batch will be stored
-         */
-        private String datasource;
-
-        public String getDatasource() {
-            return datasource;
-        }
-
-        public void setDatasource(String datasource) {
-            this.datasource = datasource;
-        }
-    }
-
-
     @ConfigurationProperties(prefix = "bernmobil.mappingrepository.datasource")
     public class MappingRepository {
 
@@ -39,6 +21,10 @@ public class BernmobilConfigurationProperties {
          * Password for the mapping datasource
          */
         private String password;
+        /**
+         * Classname of the database driver used for the mapping repository
+         */
+        private String driverClassName;
 
         public String getUrl() {
             return url;
@@ -62,6 +48,14 @@ public class BernmobilConfigurationProperties {
 
         public void setPassword(String password) {
             this.password = password;
+        }
+
+        public String getDriverClassName() {
+            return driverClassName;
+        }
+
+        public void setDriverClassName(String driverClassName) {
+            this.driverClassName = driverClassName;
         }
     }
 
@@ -106,6 +100,24 @@ public class BernmobilConfigurationProperties {
 
         public void setTimeoutDuration(long timeoutDuration) {
             this.timeoutDuration = timeoutDuration;
+        }
+    }
+
+    @ConfigurationProperties(prefix = "bernmobil.locale")
+    public class Locale {
+
+        /**
+         * The timezone in which the departures are taking place. Refer to {@link java.time.ZoneId}
+         * for information about valid values
+         */
+        private String timezone;
+
+        public String getTimezone() {
+            return timezone;
+        }
+
+        public void setTimezone(String timezone) {
+            this.timezone = timezone;
         }
     }
 }
