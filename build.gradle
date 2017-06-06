@@ -50,7 +50,7 @@ repositories {
 
 dependencies {
     compile group: 'com.google.transit', name: 'gtfs-realtime-bindings', version: '0.0.4'
-    //compile("org.springframework:spring-context:4.3.7.RELEASE")
+    compile('org.jooq:jooq:3.9.1')
     compile project(':shared')
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
     runtime 'org.xerial:sqlite-jdbc:3.16.1'
