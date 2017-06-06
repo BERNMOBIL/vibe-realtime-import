@@ -55,7 +55,7 @@ entity {
       stop_sequence: 1
       stop_id: "88423_0"
       arrival {
-        time: 1496745301
+        time: 1496747943
         delay: -2
       }
     }

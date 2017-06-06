@@ -6,7 +6,6 @@ import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleUpdateInforma
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
-import java.lang.reflect.Field;
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.ReflectionUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -28,7 +26,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { TestConfiguration.class })
 @ActiveProfiles("testConfiguration")
-public class ScheduleRepositoryTest {
+public class RealtimeImportTest {
 
     private ScheduleRepository scheduleRepository;
     private RealtimeUpdateRepository realtimeUpdateRepository;
@@ -95,7 +93,6 @@ public class ScheduleRepositoryTest {
         Assert.assertFalse(invalidMapping.isPresent());
     }
 
-
     @Test
     public void extractUpdateInformations() {
         final int EXPECTED_RESULT_SIZE = 3;
@@ -112,7 +109,7 @@ public class ScheduleRepositoryTest {
         final Time[] EXPECTED_ARRIVAL_TIMES = {
             Time.valueOf(LocalTime.parse("11:15:30")),
             Time.valueOf(LocalTime.parse("12:35:01")),
-            Time.valueOf(LocalTime.parse("12:35:01"))
+            Time.valueOf(LocalTime.parse("13:19:03"))
         };
         final Time[] EXPECTED_DEPARTURES_TIMES = {
             null,
@@ -131,10 +128,8 @@ public class ScheduleRepositoryTest {
             Assert.assertEquals(EXPECTED_ARRIVAL_TIMES[i], scheduleUpdateInformations.get(i).getActualArrival());
             Assert.assertEquals(EXPECTED_DEPARTURES_TIMES[i], scheduleUpdateInformations.get(i).getActualDeparture());
             Assert.assertNull(scheduleUpdateInformations.get(i).getScheduleId());
-
         }
     }
-
 
     @Test
     public void addScheduleIdTest() {
