@@ -86,7 +86,7 @@ public class ImportRunner {
         logger.info("Finish Realtime Update");
     }
 
-    public List<ScheduleUpdateInformation> extractScheduleUpdateInformation(List<FeedEntity> feedEntities) {
+    List<ScheduleUpdateInformation> extractScheduleUpdateInformation(List<FeedEntity> feedEntities) {
         List<ScheduleUpdateInformation> validStopTimeUpdates = new ArrayList<>();
         int numTotalUpdates = 0;
         for (FeedEntity feedEntity : feedEntities) {
@@ -107,7 +107,7 @@ public class ImportRunner {
         return validStopTimeUpdates;
     }
 
-    private ScheduleUpdateInformation convertToScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate, String gtfsTripId) {
+    ScheduleUpdateInformation convertToScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate, String gtfsTripId) {
         String gtfsStopId = stopTimeUpdate.getStopId();
         Optional<JourneyMapping> journeyMapping = journeyMapperRepository.findByGtfsTripId(gtfsTripId);
         Optional<StopMapping> stopMapping = stopMapperRepository.findByGtfsId(gtfsStopId);
@@ -121,7 +121,7 @@ public class ImportRunner {
         return null;
     }
 
-    private Collection<ScheduleUpdate> convert(List<ScheduleUpdateInformation> scheduleUpdateInformations) {
+    Collection<ScheduleUpdate> convert(List<ScheduleUpdateInformation> scheduleUpdateInformations) {
         Map<UUID, ScheduleUpdate> scheduleUpdates = new HashMap<>();
         for(ScheduleUpdateInformation info : scheduleUpdateInformations) {
             if(scheduleUpdates.containsKey(info.getScheduleId())) {
@@ -131,8 +131,8 @@ public class ImportRunner {
         }
         return scheduleUpdates.values();
     }
-    //TODO: Use timezone injection -> not working with tests
-    private static Time parseUpdateTime(Long timestamp, String timezone) {
+
+    static Time parseUpdateTime(Long timestamp, String timezone) {
         return timestamp == 0 ? null : Time.valueOf(
             LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.of(timezone)).toLocalTime());
     }

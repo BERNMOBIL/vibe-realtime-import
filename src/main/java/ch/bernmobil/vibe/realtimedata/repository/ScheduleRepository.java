@@ -42,7 +42,7 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
         }
     }
 
-    public static String concatKey(UUID journeyId, UUID stopId) {
+    private static String concatKey(UUID journeyId, UUID stopId) {
         return String.format("%s:%s", journeyId, stopId);
     }
 

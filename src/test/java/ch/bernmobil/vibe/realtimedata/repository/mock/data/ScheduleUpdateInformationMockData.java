@@ -14,14 +14,14 @@ public class ScheduleUpdateInformationMockData {
 
     private static Time[] actualArrivals = {
         Time.valueOf(LocalTime.parse("13:14:15")),
-        new Time(0),
-        new Time(0)
+        Time.valueOf(LocalTime.parse("14:00:00")),
+        Time.valueOf(LocalTime.parse("16:00:00")),
     };
 
     private static Time[] actualDepartures = {
-        new Time(0),
-        new Time(0),
-        new Time(0)
+        Time.valueOf(LocalTime.parse("13:14:35")),
+        Time.valueOf(LocalTime.parse("14:02:00")),
+        Time.valueOf(LocalTime.parse("16:07:00")),
     };
 
     private static UUID[] journeyIds = {

@@ -1,16 +1,19 @@
-package ch.bernmobil.vibe.realtimedata.repository;
+package ch.bernmobil.vibe.realtimedata;
 
-import ch.bernmobil.vibe.realtimedata.ImportRunner;
-import ch.bernmobil.vibe.realtimedata.repository.mock.JourneyMapperRepositoryMock;
-import ch.bernmobil.vibe.realtimedata.repository.mock.RealtimeUpdateRepositoryMock;
-import ch.bernmobil.vibe.realtimedata.repository.mock.ScheduleRepositoryMock;
-import ch.bernmobil.vibe.realtimedata.repository.mock.StopMapperRepositoryMock;
+import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
+import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepositoryMock;
+import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
+import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepositoryMock;
+import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepository;
+import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepositoryMock;
+import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
+import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
+import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepositoryMock;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 
@@ -19,71 +22,53 @@ import org.springframework.context.annotation.Scope;
 public class TestConfiguration {
 
     @Bean
-    @Primary
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ScheduleRepository scheduleRepository() {
         return new ScheduleRepositoryMock().getMock();
     }
 
     @Bean
-    @Primary
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public RealtimeUpdateRepository realtimeUpdateRepository() {
         return new RealtimeUpdateRepositoryMock().getMock();
     }
 
     @Bean
-    @Primary
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public JourneyMapperRepository journeyMapperRepository() {
         return new JourneyMapperRepositoryMock().getMock();
     }
 
     @Bean
-    @Primary
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public StopMapperRepository stopMapperRepository() {
         return new StopMapperRepositoryMock().getMock();
     }
 
     @Bean
-    @Primary
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ScheduleUpdateRepository scheduleUpdateRepository() {
         return Mockito.mock(ScheduleUpdateRepository.class);
     }
 
     @Bean
-    @Primary
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public UpdateHistoryRepository updateHistoryRepository() {
+        return Mockito.mock(UpdateHistoryRepository.class);
+    }
+
+    @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ImportRunner importRunner() {
+        //TODO: Mock for Import-Runner -> Constructor dependencies are not autowired
+        //return new ImportRunnerMock().getMock();
         return new ImportRunner(
             journeyMapperRepository(),
             stopMapperRepository(),
             scheduleRepository(),
             scheduleUpdateRepository(),
             realtimeUpdateRepository(),
-            Mockito.mock(UpdateHistoryRepository.class)
+            updateHistoryRepository()
         );
     }
-
-
-
-/*
-    @Primary
-    @Bean(name = "StaticDataSource")
-    public DataSource staticDataSource() {
-        DataSource dataSource = createDataSource("driver","url","username","password");
-        return dataSource;
-    }
-
-
-    private DataSource createDataSource(String driver, String url, String username, String password) {
-        DataSourceBuilder builder = DataSourceBuilder.create();
-        builder.driverClassName(driver);
-        builder.url(url);
-        builder.username(username);
-        builder.password(password);
-        return builder.build();
-    }*/
 }

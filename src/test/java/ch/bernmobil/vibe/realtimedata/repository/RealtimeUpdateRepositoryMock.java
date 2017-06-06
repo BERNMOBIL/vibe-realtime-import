@@ -1,4 +1,4 @@
-package ch.bernmobil.vibe.realtimedata.repository.mock;
+package ch.bernmobil.vibe.realtimedata.repository;
 
 import static org.mockito.Mockito.when;
 

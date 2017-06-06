@@ -1,4 +1,4 @@
-package ch.bernmobil.vibe.realtimedata.repository.mock;
+package ch.bernmobil.vibe.realtimedata.repository;
 
 import java.util.List;
 import org.mockito.Mockito;
