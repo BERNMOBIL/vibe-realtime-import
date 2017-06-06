@@ -61,6 +61,18 @@ public class ImportRunner {
         this.updateHistoryRepository = updateHistoryRepository;
     }
 
+    /**
+     * Scheduled Task which imports all Realtime-Updates.
+     * Processing-Steps:
+     * 1. Load all necessary information's (schedules, stopMappings, journeyMappings)
+     * 2. Delete old Updates
+     * 3. Load FeedEntities containing the Update Informations
+     * 4. Extract updateInformations from the FeedEntities
+     * 5. Populate the updateInformations with the not in the Feed containing scheduleId
+     * 6. Convert updateInformations to concrete ScheduleUpdate Entity
+     * 7. Save
+     * @throws Exception
+     */
     @Scheduled(fixedDelay = 30 * 1000)
     public void run() throws Exception {
         UpdateHistoryEntry lastSuccessUpdate = updateHistoryRepository.findLastSuccessUpdate();
@@ -86,6 +98,17 @@ public class ImportRunner {
         logger.info("Finish Realtime Update");
     }
 
+    /**
+     * Extract the Information needed for the ScheduleUpdate from the protobuf-informations.
+     * The following Informations are extracted from the feedEntities:
+     * - tripId
+     * - stopId
+     * - actualArrivalTime
+     * - actualDepartureTime
+     * <p>Note: If information's can't be extracted, the stopTimeUpdate will be ignored.</p>
+     * @param feedEntities Realtime-Updates, parsed by com.google.transit library
+     * @return List of ScheduleUpdateInformation's containing the extracted Informations from the feedEntities
+     */
     List<ScheduleUpdateInformation> extractScheduleUpdateInformation(List<FeedEntity> feedEntities) {
         List<ScheduleUpdateInformation> validStopTimeUpdates = new ArrayList<>();
         int numTotalUpdates = 0;
@@ -107,6 +130,13 @@ public class ImportRunner {
         return validStopTimeUpdates;
     }
 
+    /**
+     * Creates the ScheduleUpdateInformation Object from the stopTimeUpdate.
+     * <p>Note: This is a help function and is used from the extractScheduleUpdateInformation method only</p>
+     * @param stopTimeUpdate containing the GTFS-Realtime information's
+     * @param gtfsTripId corresponds to the tripId of the first parameter "stopTimeUpdate"
+     * @return ScheduleUpdateInformation object containing the informations of the stopTimeUpdate
+     */
     ScheduleUpdateInformation convertToScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate, String gtfsTripId) {
         String gtfsStopId = stopTimeUpdate.getStopId();
         Optional<JourneyMapping> journeyMapping = journeyMapperRepository.findByGtfsTripId(gtfsTripId);
@@ -121,6 +151,12 @@ public class ImportRunner {
         return null;
     }
 
+    /**
+     * Converts scheduleUpdateInformation objects into valid ScheduleUpdate entities.
+     * <p>Note: There can be only one single ScheduleUpdate by Schedule. If more than one exists, the last processed will be kept.</p>
+     * @param scheduleUpdateInformations A List of ScheduleUpdatesInformations to be converted to ScheduleUpdate
+     * @return ScheduleUpdates ready for saving to the Database
+     */
     Collection<ScheduleUpdate> convert(List<ScheduleUpdateInformation> scheduleUpdateInformations) {
         Map<UUID, ScheduleUpdate> scheduleUpdates = new HashMap<>();
         for(ScheduleUpdateInformation info : scheduleUpdateInformations) {
@@ -132,6 +168,12 @@ public class ImportRunner {
         return scheduleUpdates.values();
     }
 
+    /**
+     * Parses a timestamp (UTC-Time) to a sql.Time Object
+     * @param timestamp to convert
+     * @param timezone to use while conversion
+     * @return sql.Time object in the passed timezone
+     */
     static Time parseUpdateTime(Long timestamp, String timezone) {
         return timestamp == 0 ? null : Time.valueOf(
             LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.of(timezone)).toLocalTime());
