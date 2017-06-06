@@ -31,17 +31,11 @@ public class ScheduleUpdate {
         return schedule;
     }
 
-    //TODO: beautify
-    public static ScheduleUpdate convert(ScheduleUpdateInformation updateInformation, String timezone) {
+    public static ScheduleUpdate convert(ScheduleUpdateInformation updateInformation) {
         return new ScheduleUpdate(
-            parseUpdateTime(updateInformation.getStopTimeUpdate().getArrival().getTime(), timezone),
-            parseUpdateTime(updateInformation.getStopTimeUpdate().getDeparture().getTime(), timezone),
+            updateInformation.getActualArrival(),
+            updateInformation.getActualDeparture(),
             updateInformation.getScheduleId()
         );
-    }
-
-    private static Time parseUpdateTime(Long timestamp, String timezone) {
-        return timestamp == 0 ? null : Time.valueOf(
-            LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.of("Europe/Paris")).toLocalTime());
     }
 }

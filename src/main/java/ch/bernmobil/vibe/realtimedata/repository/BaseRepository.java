@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public abstract class BaseRepository<T> {
-    protected Map<String, T> mappings;
+    private Map<String, T> mappings;
     private JdbcTemplate jdbcTemplate;
     private RowMapper<T> rowMapper;
 
@@ -23,6 +23,9 @@ public abstract class BaseRepository<T> {
         List<T> list = jdbcTemplate.query(query, rowMapper);
         mappings = new HashMap<>(list.size());
         list.forEach(forEachConsumer);
+    }
 
+    public Map<String, T> getMappings() {
+        return mappings;
     }
 }

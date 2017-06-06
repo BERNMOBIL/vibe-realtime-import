@@ -15,11 +15,16 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
+import java.sql.Time;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -81,7 +86,7 @@ public class ImportRunner {
         logger.info("Finish Realtime Update");
     }
 
-    private List<ScheduleUpdateInformation> extractScheduleUpdateInformation(List<FeedEntity> feedEntities) {
+    public List<ScheduleUpdateInformation> extractScheduleUpdateInformation(List<FeedEntity> feedEntities) {
         List<ScheduleUpdateInformation> validStopTimeUpdates = new ArrayList<>();
         int numTotalUpdates = 0;
         for (FeedEntity feedEntity : feedEntities) {
@@ -91,7 +96,7 @@ public class ImportRunner {
 
             List<ScheduleUpdateInformation> convertedUpdates =
                     tripUpdate.getStopTimeUpdateList()
-                    .parallelStream()
+                    .stream()//TODO: ParallelStream?
                     .map(stopTimeUpdate -> convertToScheduleUpdateInformation(stopTimeUpdate, gtfsTripId))
                     .filter(Objects::nonNull)
                     .collect(toList());
@@ -107,7 +112,10 @@ public class ImportRunner {
         Optional<JourneyMapping> journeyMapping = journeyMapperRepository.findByGtfsTripId(gtfsTripId);
         Optional<StopMapping> stopMapping = stopMapperRepository.findByGtfsId(gtfsStopId);
         if(journeyMapping.isPresent() && stopMapping.isPresent()) {
-            return new ScheduleUpdateInformation(stopTimeUpdate, journeyMapping.get().getId(), stopMapping.get().getId());
+            Time actualArrival = parseUpdateTime(stopTimeUpdate.getArrival().getTime(), timezone);
+            Time actualDeparture = parseUpdateTime(stopTimeUpdate.getDeparture().getTime(), timezone);
+            return new ScheduleUpdateInformation(actualArrival, actualDeparture,
+                journeyMapping.get().getId(), stopMapping.get().getId());
         }
         logger.warn(String.format("No matching entry found for TripId: '%s' and StopId: '%s'", gtfsTripId, gtfsStopId));
         return null;
@@ -119,8 +127,13 @@ public class ImportRunner {
             if(scheduleUpdates.containsKey(info.getScheduleId())) {
                 logger.warn(String.format("Schedule update with schedule-id %s already exists. It will overwrite any existing updates", info.getScheduleId()));
             }
-            scheduleUpdates.put(info.getScheduleId(), ScheduleUpdate.convert(info, timezone));
+            scheduleUpdates.put(info.getScheduleId(), ScheduleUpdate.convert(info));
         }
         return scheduleUpdates.values();
+    }
+    //TODO: Use timezone injection -> not working with tests
+    private static Time parseUpdateTime(Long timestamp, String timezone) {
+        return timestamp == 0 ? null : Time.valueOf(
+            LocalDateTime.ofInstant(Instant.ofEpochSecond(timestamp), ZoneId.of(timezone)).toLocalTime());
     }
 }

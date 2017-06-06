@@ -30,19 +30,19 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
             .where(Predicate.equals(ScheduleContract.UPDATE, String.format("'%s'", updateTimestamp)))
             .getQuery();
         //TODO: document
-        super.load(query, schedule -> mappings.put(concatKey(schedule.getJourney(), schedule.getStop()), schedule));
+        super.load(query, schedule -> getMappings().put(concatKey(schedule.getJourney(), schedule.getStop()), schedule));
     }
 
     public void addScheduleId(List<ScheduleUpdateInformation> scheduleUpdateInformationList) {
         for(ScheduleUpdateInformation info : scheduleUpdateInformationList) {
-            Schedule schedule = mappings.get(concatKey(info.getJourneyId(), info.getStopId()));
+            Schedule schedule = getMappings().get(concatKey(info.getJourneyId(), info.getStopId()));
             if(schedule != null) {
                 info.setScheduleId(schedule.getId());
             }
         }
     }
 
-    private static String concatKey(UUID journeyId, UUID stopId) {
+    public static String concatKey(UUID journeyId, UUID stopId) {
         return String.format("%s:%s", journeyId, stopId);
     }
 

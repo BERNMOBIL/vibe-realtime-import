@@ -25,15 +25,13 @@ import org.springframework.stereotype.Repository;
 @Component
 public class StopMapperRepository extends BaseRepository<StopMapping> {
 
-
-
     @Autowired
     public StopMapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
         super(mapperDataSource, new StopMappingRowMapper());
     }
 
     public Optional<StopMapping> findByGtfsId(String gtfsId) {
-        return Optional.ofNullable(mappings.get(gtfsId));
+        return Optional.ofNullable(getMappings().get(gtfsId));
     }
 
     public void load(Timestamp updateTimestamp) {
@@ -42,7 +40,7 @@ public class StopMapperRepository extends BaseRepository<StopMapping> {
             .where(Predicate.equals(StopMapperContract.UPDATE, String.format("'%s'", updateTimestamp)))
             .getQuery();
 
-        super.load(query, stopMapping -> mappings.put(stopMapping.getGtfsId(), stopMapping));
+        super.load(query, stopMapping -> getMappings().put(stopMapping.getGtfsId(), stopMapping));
     }
 
     private static class StopMappingRowMapper implements RowMapper<StopMapping> {

@@ -30,7 +30,7 @@ public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
     }
 
     public Optional<JourneyMapping> findByGtfsTripId(String gtfsTripId) {
-        return Optional.ofNullable(mappings.get(gtfsTripId));
+        return Optional.ofNullable(getMappings().get(gtfsTripId));
     }
 
     public void load(Timestamp updateTimestamp) {
@@ -38,7 +38,7 @@ public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
             .select(JourneyMapperContract.TABLE_NAME)
             .where(Predicate.equals(JourneyMapperContract.UPDATE, String.format("'%s'", updateTimestamp)))
             .getQuery();
-        super.load(query, journeyMapping -> mappings.put(journeyMapping.getGtfsTripId(), journeyMapping));
+        super.load(query, journeyMapping -> getMappings().put(journeyMapping.getGtfsTripId(), journeyMapping));
     }
 
     private static class JourneyMappingRowMapper implements RowMapper<JourneyMapping> {
