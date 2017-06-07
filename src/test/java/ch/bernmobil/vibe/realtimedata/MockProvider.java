@@ -71,10 +71,6 @@ public class MockProvider implements MockDataProvider {
                 }
                 mock[0] = new MockResult(mockedStopMappings.size(), result);
             }
-        } else if(sql.startsWith("INSERT")) {
-            if(sql.contains("INTO SCHEDULE_UPDATE")) {
-
-            }
         }
         return mock;
     }
