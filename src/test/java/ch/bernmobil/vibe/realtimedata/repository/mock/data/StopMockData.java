@@ -27,17 +27,11 @@ public class StopMockData {
     };
 
 
-    private static Stop create(int index) {
-        return new Stop(ids[index], names[index], areas[index]);
-    }
-
-
     public static List<Stop> getDataSource() {
         if(dataSource == null) {
             dataSource = new ArrayList<>();
-
             for(int i = 0; i < ids.length; i++) {
-                dataSource.add(create(i));
+                dataSource.add(new Stop(ids[i], names[i], areas[i]));
             }
         }
 

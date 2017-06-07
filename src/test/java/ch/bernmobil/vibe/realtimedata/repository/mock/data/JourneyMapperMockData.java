@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public class JourneyMapperMockData {
     private static List<JourneyMapping> dataSource;
+    private static Map<String,JourneyMapping> mappings;
 
     private static UUID[] ids = {
         JourneyMockData.getDataSource().get(0).getId(),
@@ -35,17 +36,12 @@ public class JourneyMapperMockData {
         new Timestamp(0),
     };
 
-    private static JourneyMapping create(int index) {
-        return new JourneyMapping(gtfsTripIds[index], gtfsServiceIds[index], ids[index]);
-    }
-
 
     public static List<JourneyMapping> getDataSource() {
         if(dataSource == null) {
             dataSource = new ArrayList<>();
-
             for(int i = 0; i < ids.length; i++) {
-                dataSource.add(create(i));
+                dataSource.add(new JourneyMapping(gtfsTripIds[i], gtfsServiceIds[i], ids[i]));
             }
         }
 
@@ -53,9 +49,11 @@ public class JourneyMapperMockData {
     }
 
     public static Map<String, JourneyMapping> getMappingData() {
-        Map<String, JourneyMapping> mappings = new HashMap<>();
-        for(JourneyMapping journeyMapping : getDataSource()) {
-            mappings.put(journeyMapping.getGtfsTripId(), journeyMapping);
+        if(mappings == null) {
+            mappings = new HashMap<>();
+            for(JourneyMapping journeyMapping : getDataSource()) {
+                mappings.put(journeyMapping.getGtfsTripId(), journeyMapping);
+            }
         }
         return mappings;
     }

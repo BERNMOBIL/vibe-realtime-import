@@ -14,6 +14,7 @@ public abstract class RepositoryMock<EntityType, RepositoryType> {
         configureMock();
     }
 
+
     protected abstract void configureMock();
 
     public RepositoryType getMock() {

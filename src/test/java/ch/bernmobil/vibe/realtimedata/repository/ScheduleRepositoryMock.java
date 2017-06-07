@@ -6,10 +6,10 @@ import static org.mockito.Mockito.when;
 
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleMockData;
 import ch.bernmobil.vibe.shared.entitiy.Schedule;
+import java.util.Map;
 
 
 public class ScheduleRepositoryMock extends RepositoryMock<Schedule, ScheduleRepository>{
-
     public ScheduleRepositoryMock(){
         super(ScheduleRepository.class, ScheduleMockData.getDataSource());
     }

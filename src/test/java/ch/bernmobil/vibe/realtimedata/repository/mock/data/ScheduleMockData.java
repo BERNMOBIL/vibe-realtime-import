@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public class ScheduleMockData {
     private static List<Schedule> dataSource;
+    private static Map<String, Schedule> mappings;
 
     private static UUID[] ids = {
         UUID.fromString("635977d7-28be-4cbc-833b-f817fbc47225"),
@@ -47,17 +48,13 @@ public class ScheduleMockData {
         JourneyMockData.getDataSource().get(2).getId(),
     };
 
-    private static Schedule create(int index) {
-        return new Schedule(ids[index], platforms[index], planned_arrivals[index], planned_departures[index], stops[index], journeys[index]);
-    }
-
-
     public static List<Schedule> getDataSource() {
         if(dataSource == null) {
             dataSource = new ArrayList<>();
-
             for(int i = 0; i < ids.length; i++) {
-                dataSource.add(create(i));
+                dataSource.add(
+                    new Schedule(ids[i], platforms[i], planned_arrivals[i], planned_departures[i],
+                        stops[i], journeys[i]));
             }
         }
 
@@ -65,10 +62,12 @@ public class ScheduleMockData {
     }
 
     public static Map<String, Schedule> getMappingData() {
-        Map<String, Schedule> mappings = new HashMap<>();
-        for(Schedule schedule : getDataSource()) {
-            String key = String.format("%s:%s", schedule.getJourney(), schedule.getStop());
-            mappings.put(key, schedule);
+        if(mappings == null) {
+            mappings = new HashMap<>();
+            for(Schedule schedule : getDataSource()) {
+                String key = String.format("%s:%s", schedule.getJourney(), schedule.getStop());
+                mappings.put(key, schedule);
+            }
         }
         return mappings;
     }

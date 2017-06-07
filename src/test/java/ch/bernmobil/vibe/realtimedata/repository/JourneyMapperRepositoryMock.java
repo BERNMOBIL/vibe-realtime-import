@@ -6,24 +6,19 @@ import static org.mockito.Mockito.when;
 import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
 
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.JourneyMapperMockData;
+import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
+import java.util.Map;
 import org.mockito.Mockito;
 
 
-public class JourneyMapperRepositoryMock {
-    JourneyMapperRepository mock;
-
+public class JourneyMapperRepositoryMock extends RepositoryMock<JourneyMapping, JourneyMapperRepository>{
     public JourneyMapperRepositoryMock(){
-        mock = Mockito.mock(JourneyMapperRepository.class);
-        configureMock();
+        super(JourneyMapperRepository.class, JourneyMapperMockData.getDataSource());
     }
 
+    @Override
     protected void configureMock() {
         when(mock.getMappings()).thenReturn(JourneyMapperMockData.getMappingData());
         when(mock.findByGtfsTripId(anyString())).thenCallRealMethod();
     }
-
-    public JourneyMapperRepository getMock() {
-        return mock;
-    }
-
 }

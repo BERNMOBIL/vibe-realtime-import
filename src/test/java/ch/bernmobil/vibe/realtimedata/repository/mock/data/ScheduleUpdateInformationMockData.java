@@ -44,7 +44,8 @@ public class ScheduleUpdateInformationMockData {
 
 
     private static ScheduleUpdateInformation create(int index) {
-        return new ScheduleUpdateInformation(actualArrivals[index], actualDepartures[index], journeyIds[index], stopIds[index]);
+        return new ScheduleUpdateInformation(actualArrivals[index], actualDepartures[index],
+            journeyIds[index], stopIds[index]);
     }
 
     public static List<ScheduleUpdateInformation> getDataSource() {
@@ -64,7 +65,6 @@ public class ScheduleUpdateInformationMockData {
     public static List<ScheduleUpdateInformation> getDataSourceWithoutScheduleId() {
         if(dataSourceWithoutScheduleId == null) {
             dataSourceWithoutScheduleId = new ArrayList<>();
-
             for(int i = 0; i < actualArrivals.length; i++) {
                 dataSourceWithoutScheduleId.add(create(i));
             }

@@ -1,7 +1,6 @@
 package ch.bernmobil.vibe.realtimedata.repository.mock.data;
 
 import ch.bernmobil.vibe.shared.entitiy.Journey;
-import ch.bernmobil.vibe.shared.entitiy.Stop;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -34,17 +33,11 @@ public class JourneyMockData {
     };
 
 
-    private static Journey create(int index) {
-        return new Journey(ids[index], headsigns[index], routes[index], terminal_stations[index]);
-    }
-
-
     public static List<Journey> getDataSource() {
         if(dataSource == null) {
             dataSource = new ArrayList<>();
-
             for(int i = 0; i < ids.length; i++) {
-                dataSource.add(create(i));
+                dataSource.add(new Journey(ids[i], headsigns[i], routes[i], terminal_stations[i]));
             }
         }
 
