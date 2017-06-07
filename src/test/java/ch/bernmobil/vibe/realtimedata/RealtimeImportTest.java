@@ -43,16 +43,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ActiveProfiles("testConfiguration")
 public class RealtimeImportTest {
 
-    private ScheduleRepository scheduleRepository;
     private RealtimeUpdateRepository realtimeUpdateRepository;
-    private JourneyMapperRepository journeyMapperRepository;
-    private StopMapperRepository stopMapperRepository;
     private ImportRunner importRunner;
     private DSLContext dslContext;
 
     private boolean isFirstInitialization = true;
     private static List<ScheduleUpdateInformation> mockedScheduleUpdateInformations;
-    private static List<ScheduleUpdateInformation> mockedScheduleUpdateInformationsWithoutScheduleId;
 
     //BeforeClass executed before @Autowired
     @Before
@@ -61,52 +57,7 @@ public class RealtimeImportTest {
             isFirstInitialization = false;
 
             mockedScheduleUpdateInformations = ScheduleUpdateInformationMockData.getDataSource();
-            mockedScheduleUpdateInformationsWithoutScheduleId = ScheduleUpdateInformationMockData.getDataSourceWithoutScheduleId();
         }
-    }
-
-    @Test
-    public void getJourneyMappingWithValidGTFSIdTest() {
-        final String validGtfsTripId = "101_000827_10_95932_76646_07:26_07:45";
-        final String expectedServiceId = "338";
-        final UUID expectedUuid = UUID.fromString("d0ce83da-8eb2-47c8-aa85-f98a7cf7bae4");
-
-        Optional<JourneyMapping> validMapping = journeyMapperRepository.findByGtfsTripId(validGtfsTripId);
-        JourneyMapping validJourneyMapping = validMapping.get();
-
-        Assert.assertTrue(validMapping.isPresent());
-        Assert.assertEquals(validGtfsTripId, validJourneyMapping.getGtfsTripId());
-        Assert.assertEquals(expectedServiceId, validJourneyMapping.getGtfsServiceId());
-        Assert.assertEquals(expectedUuid, validJourneyMapping.getId());
-    }
-
-    @Test
-    public void getJourneyMappingWithInvalidGTFSIdTest() {
-        final String invalidGtfsTripId = "not_valid_id";
-
-        Optional<JourneyMapping> invalidMapping = journeyMapperRepository.findByGtfsTripId(invalidGtfsTripId);
-        Assert.assertFalse(invalidMapping.isPresent());
-    }
-
-    @Test
-    public void getStopMappingWithValidGTFSIdTest() {
-        final String validGtfsId = "76313_0";
-        final UUID expectedUuid = UUID.fromString("115a3a10-7744-4226-adf3-8c35ad6fac0a");
-
-        Optional<StopMapping> validMapping = stopMapperRepository.findByGtfsId(validGtfsId);
-        StopMapping validStopMapping = validMapping.get();
-
-        Assert.assertTrue(validMapping.isPresent());
-        Assert.assertEquals(validGtfsId, validStopMapping.getGtfsId());
-        Assert.assertEquals(expectedUuid, validStopMapping.getId());
-    }
-
-    @Test
-    public void getStopMappingWithInvalidGTFSIdTest() {
-        final String invalidGtfsId = "not_valid_id";
-
-        Optional<StopMapping> invalidMapping = stopMapperRepository.findByGtfsId(invalidGtfsId);
-        Assert.assertFalse(invalidMapping.isPresent());
     }
 
     @Test
@@ -144,27 +95,6 @@ public class RealtimeImportTest {
             Assert.assertEquals(expectedArrivalTimes[i], scheduleUpdateInformations.get(i).getActualArrival());
             Assert.assertEquals(expectedDeparturesTimes[i], scheduleUpdateInformations.get(i).getActualDeparture());
             Assert.assertNull(scheduleUpdateInformations.get(i).getScheduleId());
-        }
-    }
-
-    @Test
-    public void addScheduleIdTest() {
-        final UUID[] expectedScheduleIds = {
-            UUID.fromString("635977d7-28be-4cbc-833b-f817fbc47225"),
-            UUID.fromString("1b50cc76-83be-4aa0-bde9-74fc188a8978"),
-            UUID.fromString("86deb4f8-aaa3-4734-a772-1ee38f3e0344")
-        };
-
-        List<ScheduleUpdateInformation> scheduleUpdateInformationList = new ArrayList<>(mockedScheduleUpdateInformationsWithoutScheduleId);
-
-        for(int i = 0; i < expectedScheduleIds.length; i++) {
-            Assert.assertNull(scheduleUpdateInformationList.get(i).getScheduleId());
-        }
-
-        scheduleRepository.addScheduleId(scheduleUpdateInformationList);
-
-        for(int i = 0; i < expectedScheduleIds.length; i++) {
-            Assert.assertEquals(expectedScheduleIds[i], scheduleUpdateInformationList.get(i).getScheduleId());
         }
     }
 
@@ -230,85 +160,9 @@ public class RealtimeImportTest {
         Assert.assertEquals(expectedTimeAustralia, parsedTimeAustralia);
     }
 
-    @Test
-    public void loadSchedulesTest() {
-        final int expectedNumResults = 3;
-        ScheduleRepository scheduleRepository = new ScheduleRepository(dslContext);
-        scheduleRepository.load(new Timestamp(0));
-        Collection<Schedule> schedules = scheduleRepository.getEntries().values();
-        List<Schedule> sortedSchedules = schedules.stream().sorted(Comparator.comparing(Schedule::getId)).collect(toList());
-        List<Schedule> expectedSchedules = ScheduleMockData.getDataSource().stream().sorted(Comparator.comparing(Schedule::getId)).collect(toList());
-
-        for(int i = 0; i < expectedNumResults; i++) {
-            Schedule expected = expectedSchedules.get(i);
-            Schedule actual = sortedSchedules.get(i);
-            Assert.assertEquals(expected.getId(), actual.getId());
-            Assert.assertEquals(expected.getJourney(), actual.getJourney());
-            Assert.assertEquals(expected.getPlannedArrival(), actual.getPlannedArrival());
-            Assert.assertEquals(expected.getPlannedDeparture(), actual.getPlannedDeparture());
-            Assert.assertEquals(expected.getPlatform(), actual.getPlatform());
-            Assert.assertEquals(expected.getStop(), actual.getStop());
-        }
-        Assert.assertEquals(expectedNumResults, schedules.size());
-    }
-
-    @Test
-    public void loadJourneyMappingTest() {
-        final int expectedNumResults = 3;
-        JourneyMapperRepository journeyMapperRepository = new JourneyMapperRepository(dslContext);
-        journeyMapperRepository.load(new Timestamp(0));
-        Collection<JourneyMapping> journeyMappings = journeyMapperRepository.getEntries().values();
-        List<JourneyMapping> sortedJourneyMappings = journeyMappings.stream().sorted(Comparator.comparing(JourneyMapping::getId)).collect(toList());
-        List<JourneyMapping> expectedJourneyMappings = JourneyMapperMockData.getDataSource().stream().sorted(Comparator.comparing(JourneyMapping::getId)).collect(toList());
-
-        for(int i = 0; i < expectedNumResults; i++) {
-            JourneyMapping expected = expectedJourneyMappings.get(i);
-            JourneyMapping actual = sortedJourneyMappings.get(i);
-            Assert.assertEquals(expected.getId(), actual.getId());
-            Assert.assertEquals(expected.getGtfsTripId(), actual.getGtfsTripId());
-            Assert.assertEquals(expected.getGtfsServiceId(), actual.getGtfsServiceId());
-        }
-        Assert.assertEquals(expectedNumResults, journeyMappings.size());
-    }
-
-    @Test
-    public void loadStopMappingTest() {
-        final int expectedNumResults = 3;
-        StopMapperRepository stopMapperRepository = new StopMapperRepository(dslContext);
-        stopMapperRepository.load(new Timestamp(0));
-        Collection<StopMapping> stopMappings = stopMapperRepository.getEntries().values();
-        List<StopMapping> sortedStopMappings = stopMappings.stream().sorted(Comparator.comparing(StopMapping::getId)).collect(toList());
-        List<StopMapping> expectedStopMappings = StopMapperMockData.getDataSource().stream().sorted(Comparator.comparing(StopMapping::getId)).collect(toList());
-
-        for(int i = 0; i < expectedNumResults; i++) {
-            StopMapping expected = expectedStopMappings.get(i);
-            StopMapping actual = sortedStopMappings.get(i);
-            Assert.assertEquals(expected.getId(), actual.getId());
-            Assert.assertEquals(expected.getGtfsId(), actual.getGtfsId());
-        }
-
-        Assert.assertEquals(expectedNumResults, stopMappings.size());
-    }
-
-
-    @Autowired
-    private void setScheduleRepository(ScheduleRepository scheduleRepository) {
-        this.scheduleRepository = scheduleRepository;
-    }
-
     @Autowired
     private void setRealtimeUpdateRepository(RealtimeUpdateRepository realtimeUpdateRepository) {
         this.realtimeUpdateRepository = realtimeUpdateRepository;
-    }
-
-    @Autowired
-    private void setJourneyMapperRepository(JourneyMapperRepository journeyMapperRepository) {
-        this.journeyMapperRepository = journeyMapperRepository;
-    }
-
-    @Autowired
-    private void setStopMapperRepository(StopMapperRepository stopMapperRepository) {
-        this.stopMapperRepository = stopMapperRepository;
     }
 
     @Autowired
