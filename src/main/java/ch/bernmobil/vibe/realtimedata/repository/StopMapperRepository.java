@@ -27,7 +27,7 @@ public class StopMapperRepository extends BaseRepository<StopMapping> {
     }
 
     public Optional<StopMapping> findByGtfsId(String gtfsId) {
-        return Optional.ofNullable(getMappings().get(gtfsId));
+        return Optional.ofNullable(getEntries().get(gtfsId));
     }
 
     @Override
@@ -42,6 +42,6 @@ public class StopMapperRepository extends BaseRepository<StopMapping> {
     }
 
     protected Consumer<StopMapping> getConsumer() {
-        return stopMapping -> getMappings().put(stopMapping.getGtfsId(), stopMapping);
+        return stopMapping -> getEntries().put(stopMapping.getGtfsId(), stopMapping);
     }
 }

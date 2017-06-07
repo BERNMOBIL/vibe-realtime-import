@@ -27,7 +27,7 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
 
     public void addScheduleId(List<ScheduleUpdateInformation> scheduleUpdateInformationList) {
         for(ScheduleUpdateInformation info : scheduleUpdateInformationList) {
-            Schedule schedule = getMappings().get(concatKey(info.getJourneyId(), info.getStopId()));
+            Schedule schedule = getEntries().get(concatKey(info.getJourneyId(), info.getStopId()));
             if(schedule != null) {
                 info.setScheduleId(schedule.getId());
             }
@@ -53,6 +53,6 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
 
     @Override
     protected Consumer<Schedule> getConsumer() {
-        return schedule -> getMappings().put(concatKey(schedule.getJourney(), schedule.getStop()), schedule);
+        return schedule -> getEntries().put(concatKey(schedule.getJourney(), schedule.getStop()), schedule);
     }
 }

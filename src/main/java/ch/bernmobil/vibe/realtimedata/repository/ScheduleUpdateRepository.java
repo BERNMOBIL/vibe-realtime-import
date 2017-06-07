@@ -3,8 +3,8 @@ package ch.bernmobil.vibe.realtimedata.repository;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.table;
 
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import ch.bernmobil.vibe.shared.contract.ScheduleUpdateContract;
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;

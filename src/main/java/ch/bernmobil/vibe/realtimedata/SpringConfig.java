@@ -1,5 +1,6 @@
 package ch.bernmobil.vibe.realtimedata;
 
+import ch.bernmobil.vibe.shared.UpdateTimestampManager;
 import javax.sql.DataSource;
 
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
@@ -11,11 +12,13 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,10 +40,11 @@ public class SpringConfig {
     @Bean
     public UpdateManager updateManager(@Qualifier("MapperRepository") UpdateManagerRepository mapperRepository,
                                        @Qualifier("StaticRepository") UpdateManagerRepository staticRepository,
+                                       UpdateTimestampManager updateTimestampManager,
                                        UpdateHistoryRepository updateHistoryRepository) {
         int historySize = environment.getProperty("bernmobil.history.size", Integer.class);
         Duration timeout = Duration.ofMinutes(environment.getProperty("bernmobil.history.timeout-duration", Long.class));
-        return new UpdateManager(mapperRepository, staticRepository, updateHistoryRepository, historySize, timeout);
+        return new UpdateManager(mapperRepository, staticRepository, updateHistoryRepository, historySize, timeout, updateTimestampManager);
     }
 
     @Bean(name = "MapperRepository")
@@ -56,6 +60,12 @@ public class SpringConfig {
     @Bean
     public UpdateHistoryRepository updateHistoryRepository(@Qualifier("StaticDslContext") DSLContext dslContext) {
         return new UpdateHistoryRepository(dslContext);
+    }
+
+    @Bean
+    @Scope(BeanDefinition.SCOPE_SINGLETON)
+    public UpdateTimestampManager updateTimestampManager(){
+        return new UpdateTimestampManager();
     }
 
     @Bean(name = "StaticDslContext")

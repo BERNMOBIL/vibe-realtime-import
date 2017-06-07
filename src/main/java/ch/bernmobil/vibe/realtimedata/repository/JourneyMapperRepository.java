@@ -26,7 +26,7 @@ public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
     }
 
     public Optional<JourneyMapping> findByGtfsTripId(String gtfsTripId) {
-        return Optional.ofNullable(getMappings().get(gtfsTripId));
+        return Optional.ofNullable(getEntries().get(gtfsTripId));
     }
 
     @Override
@@ -43,6 +43,6 @@ public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
 
     @Override
     protected Consumer<JourneyMapping> getConsumer() {
-        return journeyMapping -> getMappings().put(journeyMapping.getGtfsTripId(), journeyMapping);
+        return journeyMapping -> getEntries().put(journeyMapping.getGtfsTripId(), journeyMapping);
     }
 }

@@ -14,40 +14,69 @@ import org.jooq.Record;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 
-
+/**
+ * An abstract Class which defines the minimal functionality of a default repository
+ * @param <T> The Type of the Entity handled by the repository
+ */
 public abstract class BaseRepository<T> {
-
+    private static final String UPDATE_COLUMN = "update";
     private final Class<T> classType;
-    private Map<String, T> mappings;
-    private DSLContext dslContext;
+    private Map<String, T> entries;
+    @SuppressWarnings("WeakerAccess")
+    protected DSLContext dslContext;
 
+    /**
+     *
+     * @param entityClassType Type of Entity <p>Note: Has to be passed via Constructor because of Java-Type-Erasure</p>
+     * @param dslContext Jooq DSLContext to use for queries within this repository.
+     */
     BaseRepository(Class<T> entityClassType, DSLContext dslContext) {
         this.dslContext = dslContext;
         this.classType = entityClassType;
     }
 
-
+    /**
+     * Loads records from Database using the DSLContext, convert the records to Java POJO's and save them into {@link #entries} field
+     * The method uses three helpers to build the query:
+     * - {@link #getTable()}
+     * - {@link #getFields()}
+     * - {@link #getConsumer()}
+     * @param updateTimestamp refers to the version of Data to Load
+     */
     public void load(Timestamp updateTimestamp) {
-        //TODO: remove raw string
-        Field<Timestamp> updateField = DSL.field("update", Timestamp.class);
+        Field<Timestamp> updateField = DSL.field(UPDATE_COLUMN, Timestamp.class);
         List<T> list = dslContext
             .select(getFields())
             .from(getTable())
-            .where(updateField.equal(inline(updateTimestamp)))
+            .where(updateField.equal(updateTimestamp))
             .fetchInto(classType);
-        mappings = new HashMap<>(list.size());
-
+        entries = new HashMap<>(list.size());
         list.forEach(getConsumer());
     }
 
+    /**
+     * Helper-Method for {@link #load(Timestamp)}
+     * @return Any implementing method has to return the table to load from the database
+     */
     protected abstract Table<Record> getTable();
+
+    /**
+     * Helper-Method for {@link #load(Timestamp)}
+     * @return Any implementing method has to return the fields to load from the database
+     */
     protected abstract Collection<Field<?>> getFields();
+
+    /**
+     * Helper-Method for {@link #load(Timestamp)}
+     * @return Any implementing method hast to return a Consumer, which put the loaded records into the entries map
+     */
     protected abstract Consumer<T> getConsumer();
     /**
      *
-     * @return mappings loaded with the load method
+     * @return entries loaded with the load method
      */
-    Map<String, T> getMappings() {
-        return mappings;
+    @SuppressWarnings("WeakerAccess")
+    public Map<String, T> getEntries() {
+        return entries;
     }
 }

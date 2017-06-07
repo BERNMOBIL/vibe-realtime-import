@@ -2,24 +2,34 @@ package ch.bernmobil.vibe.realtimedata;
 
 import static java.util.stream.Collectors.toList;
 
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
+
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepository;
+import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
+import ch.bernmobil.vibe.realtimedata.repository.mock.data.JourneyMapperMockData;
+import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleMockData;
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleUpdateInformationMockData;
+import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleUpdateMockData;
+import ch.bernmobil.vibe.realtimedata.repository.mock.data.StopMapperMockData;
+import ch.bernmobil.vibe.shared.entitiy.Schedule;
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jooq.DSLContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +51,7 @@ public class RealtimeImportTest {
     private JourneyMapperRepository journeyMapperRepository;
     private StopMapperRepository stopMapperRepository;
     private ImportRunner importRunner;
+    private DSLContext dslContext;
 
     private boolean isFirstInitialization = true;
     private static List<ScheduleUpdateInformation> mockedScheduleUpdateInformations;
@@ -207,7 +218,6 @@ public class RealtimeImportTest {
 
     }
 
-
     @Test
     public void parseTimeTest() {
         final long inputTimestamp = 1496754508;
@@ -222,6 +232,67 @@ public class RealtimeImportTest {
         Assert.assertEquals(expectedTimeEurope, parsedTimeEurope);
         Assert.assertEquals(expectedTimeAustralia, parsedTimeAustralia);
     }
+
+    @Test
+    public void loadSchedulesTest() {
+        final int expectedNumResults = 3;
+        ScheduleRepository scheduleRepository = new ScheduleRepository(dslContext);
+        scheduleRepository.load(new Timestamp(0));
+        Collection<Schedule> schedules = scheduleRepository.getEntries().values();
+        List<Schedule> sortedSchedules = schedules.stream().sorted(Comparator.comparing(Schedule::getId)).collect(toList());
+        List<Schedule> expectedSchedules = ScheduleMockData.getDataSource().stream().sorted(Comparator.comparing(Schedule::getId)).collect(toList());
+
+        for(int i = 0; i < expectedNumResults; i++) {
+            Schedule expected = expectedSchedules.get(i);
+            Schedule actual = sortedSchedules.get(i);
+            Assert.assertEquals(expected.getId(), actual.getId());
+            Assert.assertEquals(expected.getJourney(), actual.getJourney());
+            Assert.assertEquals(expected.getPlannedArrival(), actual.getPlannedArrival());
+            Assert.assertEquals(expected.getPlannedDeparture(), actual.getPlannedDeparture());
+            Assert.assertEquals(expected.getPlatform(), actual.getPlatform());
+            Assert.assertEquals(expected.getStop(), actual.getStop());
+        }
+        Assert.assertEquals(expectedNumResults, schedules.size());
+    }
+
+    @Test
+    public void loadJourneyMappingTest() {
+        final int expectedNumResults = 3;
+        JourneyMapperRepository journeyMapperRepository = new JourneyMapperRepository(dslContext);
+        journeyMapperRepository.load(new Timestamp(0));
+        Collection<JourneyMapping> journeyMappings = journeyMapperRepository.getEntries().values();
+        List<JourneyMapping> sortedJourneyMappings = journeyMappings.stream().sorted(Comparator.comparing(JourneyMapping::getId)).collect(toList());
+        List<JourneyMapping> expectedJourneyMappings = JourneyMapperMockData.getDataSource().stream().sorted(Comparator.comparing(JourneyMapping::getId)).collect(toList());
+
+        for(int i = 0; i < expectedNumResults; i++) {
+            JourneyMapping expected = expectedJourneyMappings.get(i);
+            JourneyMapping actual = sortedJourneyMappings.get(i);
+            Assert.assertEquals(expected.getId(), actual.getId());
+            Assert.assertEquals(expected.getGtfsTripId(), actual.getGtfsTripId());
+            Assert.assertEquals(expected.getGtfsServiceId(), actual.getGtfsServiceId());
+        }
+        Assert.assertEquals(expectedNumResults, journeyMappings.size());
+    }
+
+    @Test
+    public void loadStopMappingTest() {
+        final int expectedNumResults = 3;
+        StopMapperRepository stopMapperRepository = new StopMapperRepository(dslContext);
+        stopMapperRepository.load(new Timestamp(0));
+        Collection<StopMapping> stopMappings = stopMapperRepository.getEntries().values();
+        List<StopMapping> sortedStopMappings = stopMappings.stream().sorted(Comparator.comparing(StopMapping::getId)).collect(toList());
+        List<StopMapping> expectedStopMappings = StopMapperMockData.getDataSource().stream().sorted(Comparator.comparing(StopMapping::getId)).collect(toList());
+
+        for(int i = 0; i < expectedNumResults; i++) {
+            StopMapping expected = expectedStopMappings.get(i);
+            StopMapping actual = sortedStopMappings.get(i);
+            Assert.assertEquals(expected.getId(), actual.getId());
+            Assert.assertEquals(expected.getGtfsId(), actual.getGtfsId());
+        }
+
+        Assert.assertEquals(expectedNumResults, stopMappings.size());
+    }
+
 
     @Autowired
     private void setScheduleRepository(ScheduleRepository scheduleRepository) {
@@ -241,6 +312,11 @@ public class RealtimeImportTest {
     @Autowired
     private void setStopMapperRepository(StopMapperRepository stopMapperRepository) {
         this.stopMapperRepository = stopMapperRepository;
+    }
+
+    @Autowired
+    private void setMockedDslContext(DSLContext dslContext) {
+        this.dslContext = dslContext;
     }
 
     @Autowired

@@ -2,7 +2,6 @@ package ch.bernmobil.vibe.realtimedata;
 
 import static java.util.stream.Collectors.toList;
 
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
@@ -11,6 +10,7 @@ import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
 import ch.bernmobil.vibe.shared.UpdateHistoryEntry;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -122,7 +122,7 @@ public class ImportRunner {
 
             List<ScheduleUpdateInformation> convertedUpdates =
                     tripUpdate.getStopTimeUpdateList()
-                    .stream()//TODO: ParallelStream?
+                    .stream()
                     .map(stopTimeUpdate -> convertToScheduleUpdateInformation(stopTimeUpdate, gtfsTripId))
                     .filter(Objects::nonNull)
                     .collect(toList());
