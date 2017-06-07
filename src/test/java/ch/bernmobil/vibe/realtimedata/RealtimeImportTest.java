@@ -2,7 +2,7 @@ package ch.bernmobil.vibe.realtimedata;
 
 import static java.util.stream.Collectors.toList;
 
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
