@@ -7,12 +7,6 @@ jooq {
             url = jooqStaticUrl
             user = jooqStaticUser
             password = jooqStaticPassword
-            properties {
-                property {
-                    key = 'ssl'
-                    value = 'true'
-                }
-            }
         }
         generator {
             name = 'org.jooq.util.DefaultGenerator'
@@ -53,12 +47,7 @@ jooq {
             url = jooqMappingsUrl
             user = jooqMappingsUser
             password = jooqMappingsPassword
-            properties {
-                property {
-                    key = 'ssl'
-                    value = 'true'
-                }
-            }
+
         }
         generator {
             name = 'org.jooq.util.DefaultGenerator'
