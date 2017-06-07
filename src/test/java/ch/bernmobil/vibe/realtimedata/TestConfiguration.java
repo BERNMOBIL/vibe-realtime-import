@@ -10,6 +10,11 @@ import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepositoryMock;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
+import org.jooq.tools.jdbc.MockConnection;
+import org.jooq.tools.jdbc.MockDataProvider;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -60,8 +65,6 @@ public class TestConfiguration {
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ImportRunner importRunner() {
-        //TODO: Mock for Import-Runner -> Constructor dependencies are not autowired
-        //return new ImportRunnerMock().getMock();
         return new ImportRunner(
             journeyMapperRepository(),
             stopMapperRepository(),
@@ -70,5 +73,13 @@ public class TestConfiguration {
             realtimeUpdateRepository(),
             updateHistoryRepository()
         );
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public DSLContext mockedDslContext() {
+        MockDataProvider provider = new MockProvider();
+        MockConnection connection = new MockConnection(provider);
+        return DSL.using(connection, SQLDialect.POSTGRES);
     }
 }
