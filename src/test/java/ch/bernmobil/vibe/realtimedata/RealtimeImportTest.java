@@ -2,20 +2,17 @@ package ch.bernmobil.vibe.realtimedata;
 
 import static java.util.stream.Collectors.toList;
 
-
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepository;
-import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.JourneyMapperMockData;
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleMockData;
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleUpdateInformationMockData;
-import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleUpdateMockData;
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.StopMapperMockData;
 import ch.bernmobil.vibe.shared.entitiy.Schedule;
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
