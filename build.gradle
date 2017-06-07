@@ -12,10 +12,15 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath('se.transmode.gradle:gradle-docker:1.2')
+        classpath 'nu.studer:gradle-jooq-plugin:2.0.6'
+
     }
 }
 apply plugin: 'java'
@@ -23,7 +28,8 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'docker'
-
+apply plugin: 'nu.studer.jooq'
+apply from: 'jooq.gradle'
 
 jar {
     baseName = 'realtime-import'
@@ -57,4 +63,9 @@ dependencies {
     runtime('org.postgresql:postgresql')
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.3.RELEASE'
     testCompile group: 'org.powermock', name: 'powermock-mockito-release-full', version: '1.6.4'
+    jooqRuntime 'postgresql:postgresql:9.1-901.jdbc4'
+    compile 'org.jooq:jooq'
+
 }
+
+
