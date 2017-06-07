@@ -1,5 +1,6 @@
 package ch.bernmobil.vibe.realtimedata.entity;
 
+import ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate;
 import java.sql.Time;
 import java.util.UUID;
 
@@ -56,5 +57,9 @@ public class ScheduleUpdateInformation {
 
     public void setScheduleId(UUID scheduleId) {
         this.scheduleId = scheduleId;
+    }
+
+    public ScheduleUpdate convert() {
+        return new ScheduleUpdate(getActualArrival(), getActualDeparture(), getScheduleId());
     }
 }

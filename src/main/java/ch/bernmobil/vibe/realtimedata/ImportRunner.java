@@ -10,7 +10,7 @@ import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
 import ch.bernmobil.vibe.shared.UpdateHistoryEntry;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -166,7 +166,7 @@ public class ImportRunner {
             if(scheduleUpdates.containsKey(info.getScheduleId())) {
                 logger.warn(String.format("Schedule update with schedule-id %s already exists. It will overwrite any existing updates", info.getScheduleId()));
             }
-            scheduleUpdates.put(info.getScheduleId(), ScheduleUpdate.convert(info));
+            scheduleUpdates.put(info.getScheduleId(), info.convert());
         }
         return scheduleUpdates.values();
     }
