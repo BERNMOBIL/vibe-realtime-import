@@ -59,6 +59,11 @@ public class ScheduleUpdateInformation {
         this.scheduleId = scheduleId;
     }
 
+    /**
+     * Converts a {@link ScheduleUpdateInformation} object to a {@link ScheduleUpdate} object
+     * <p>Notice: The converted {@link ScheduleUpdate} is ready to save</p>
+     * @return Conversion from {@link ScheduleUpdateInformation} to {@link ScheduleUpdate}
+     */
     public ScheduleUpdate convert() {
         return new ScheduleUpdate(getActualArrival(), getActualDeparture(), getScheduleId());
     }

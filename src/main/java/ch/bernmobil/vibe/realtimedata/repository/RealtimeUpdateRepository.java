@@ -11,6 +11,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Repository for accessing the Realtime-Update-API
+ */
 @Component
 public class RealtimeUpdateRepository {
     private List<FeedEntity> feedEntities;
@@ -19,6 +22,10 @@ public class RealtimeUpdateRepository {
     @Value("${bernmobil.realtime-source.url}")
     private String realtimeUrl;
 
+    /**
+     * Downloads the GTFS-Realtime Feeds and store it after parsing the downloaded protobuf-binary as {@link FeedMessage}
+     * <p>Notice: The {@link com.google.transit.realtime.GtfsRealtime}-Library is used to convert the Feed-Messages</p>
+     */
     private void loadFeedEntities() {
         try {
             URL url = new URL(realtimeUrl);
@@ -29,6 +36,10 @@ public class RealtimeUpdateRepository {
         }
     }
 
+    /**
+     * Loads the {@link FeedMessage} using the {@link #loadFeedEntities()}-Method and returns it's result
+     * @return An unmodifiableList of the {@link #feedEntities}
+     */
     public List<FeedEntity> findAll() {
         loadFeedEntities();
         return Collections.unmodifiableList(feedEntities);

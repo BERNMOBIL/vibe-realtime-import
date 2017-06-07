@@ -1,6 +1,10 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import static org.jooq.impl.DSL.inline;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -8,11 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.Table;
-import org.jooq.impl.DSL;
 
 /**
  * An abstract Class which defines the minimal functionality of a default repository
