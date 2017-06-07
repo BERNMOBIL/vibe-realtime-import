@@ -5,6 +5,9 @@ import javax.sql.DataSource;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
 import ch.bernmobil.vibe.shared.UpdateManager;
 import ch.bernmobil.vibe.shared.UpdateManagerRepository;
+import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,26 +33,6 @@ public class SpringConfig {
 
     private Environment environment;
 
-    @Bean(name = "StaticDataSource")
-    public DataSource staticDataSource() {
-        return createDataSource(
-            environment.getProperty("spring.datasource.driver-class-name"),
-            environment.getProperty("spring.datasource.url"),
-            environment.getProperty("spring.datasource.username"),
-            environment.getProperty("spring.datasource.password")
-        );
-    }
-
-    @Primary
-    @Bean(name = "MapperDataSource")
-    public DataSource mapperDataSource() {
-        return createDataSource(
-            environment.getProperty("bernmobil.mappingrepository.datasource.driver-class-name"),
-            environment.getProperty("bernmobil.mappingrepository.datasource.url"),
-            environment.getProperty("bernmobil.mappingrepository.datasource.username"),
-            environment.getProperty("bernmobil.mappingrepository.datasource.password")
-        );
-    }
 
     @Bean
     public UpdateManager updateManager(@Qualifier("MapperRepository") UpdateManagerRepository mapperRepository,
@@ -61,18 +44,46 @@ public class SpringConfig {
     }
 
     @Bean(name = "MapperRepository")
-    public UpdateManagerRepository mapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
-        return new UpdateManagerRepository(new JdbcTemplate(mapperDataSource));
+    public UpdateManagerRepository mapperRepository(@Qualifier("MapperDslContext") DSLContext dslContext) {
+        return new UpdateManagerRepository(dslContext);
     }
 
     @Bean(name = "StaticRepository")
-    public UpdateManagerRepository staticRepository(@Qualifier("StaticDataSource") DataSource staticDataSource) {
-        return new UpdateManagerRepository(new JdbcTemplate(staticDataSource));
+    public UpdateManagerRepository staticRepository(@Qualifier("StaticDslContext")DSLContext dslContext) {
+        return new UpdateManagerRepository(dslContext);
     }
 
     @Bean
-    public UpdateHistoryRepository updateHistoryRepository(@Qualifier("StaticDataSource")DataSource dataSource) {
-        return new UpdateHistoryRepository(dataSource);
+    public UpdateHistoryRepository updateHistoryRepository(@Qualifier("StaticDslContext") DSLContext dslContext) {
+        return new UpdateHistoryRepository(dslContext);
+    }
+
+    @Bean(name = "StaticDslContext")
+    public DSLContext staticDslContext() {
+        DataSource dataSource = createDataSource(
+            environment.getProperty("spring.datasource.driver-class-name"),
+            environment.getProperty("spring.datasource.url"),
+            environment.getProperty("spring.datasource.username"),
+            environment.getProperty("spring.datasource.password")
+        );
+        return getDslContext(dataSource);
+    }
+
+    @Bean(name = "MapperDslContext")
+    public DSLContext mapperDslContext() {
+        DataSource dataSource = createDataSource(
+            environment.getProperty("bernmobil.mappingrepository.datasource.driver-class-name"),
+            environment.getProperty("bernmobil.mappingrepository.datasource.url"),
+            environment.getProperty("bernmobil.mappingrepository.datasource.username"),
+            environment.getProperty("bernmobil.mappingrepository.datasource.password")
+        );
+        return getDslContext(dataSource);
+    }
+
+    private DSLContext getDslContext(DataSource dataSource) {
+        String dialectString = environment.getProperty("spring.jooq.sql-dialect").toUpperCase();
+        SQLDialect dialect = SQLDialect.valueOf(dialectString);
+        return DSL.using(dataSource, dialect);
     }
 
     private DataSource createDataSource(String driver, String url, String username, String password) {

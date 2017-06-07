@@ -1,41 +1,53 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import static org.jooq.impl.DSL.inline;
 
-import javax.sql.DataSource;
+import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 
 
 public abstract class BaseRepository<T> {
+
+    private final Class<T> classType;
     private Map<String, T> mappings;
-    private JdbcTemplate jdbcTemplate;
-    private RowMapper<T> rowMapper;
+    private DSLContext dslContext;
 
-    public BaseRepository(DataSource dataSource, RowMapper<T> rowMapper) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.rowMapper = rowMapper;
+    BaseRepository(Class<T> entityClassType, DSLContext dslContext) {
+        this.dslContext = dslContext;
+        this.classType = entityClassType;
     }
 
-    /**
-     * Execute query, collect and save results in the mappings field with help of the consumer.
-     * @param query Database-Query to execute to collect data from Database
-     * @param forEachConsumer Consumer which is executed on each collected row.
-     */
-    public void load(String query, Consumer<T> forEachConsumer) {
-        List<T> list = jdbcTemplate.query(query, rowMapper);
+
+    public void load(Timestamp updateTimestamp) {
+        //TODO: remove raw string
+        Field<Timestamp> updateField = DSL.field("update", Timestamp.class);
+        List<T> list = dslContext
+            .select(getFields())
+            .from(getTable())
+            .where(updateField.equal(inline(updateTimestamp)))
+            .fetchInto(classType);
         mappings = new HashMap<>(list.size());
-        list.forEach(forEachConsumer);
+
+        list.forEach(getConsumer());
     }
 
+    protected abstract Table<Record> getTable();
+    protected abstract Collection<Field<?>> getFields();
+    protected abstract Consumer<T> getConsumer();
     /**
      *
      * @return mappings loaded with the load method
      */
-    public Map<String, T> getMappings() {
+    Map<String, T> getMappings() {
         return mappings;
     }
 }

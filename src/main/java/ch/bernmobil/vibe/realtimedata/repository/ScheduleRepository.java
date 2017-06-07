@@ -1,36 +1,28 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
+import static java.util.stream.Collectors.toList;
+import static org.jooq.impl.DSL.table;
+
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
-import ch.bernmobil.vibe.shared.QueryBuilder;
-import ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
 import ch.bernmobil.vibe.shared.contract.ScheduleContract;
 import ch.bernmobil.vibe.shared.entitiy.Schedule;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ScheduleRepository extends BaseRepository<Schedule> {
-
-    public ScheduleRepository(@Qualifier("StaticDataSource") DataSource dataSource) {
-        super(dataSource, new ScheduleRowMapper());
-    }
-
-    public void load(Timestamp updateTimestamp) {
-        String query = new QueryBuilder()
-            .select(ScheduleContract.TABLE_NAME)
-            .where(Predicate.equals(ScheduleContract.UPDATE, String.format("'%s'", updateTimestamp)))
-            .getQuery();
-        //TODO: document
-        super.load(query, schedule -> getMappings().put(concatKey(schedule.getJourney(), schedule.getStop()), schedule));
+    public ScheduleRepository(@Qualifier("StaticDslContext")DSLContext dslContext) {
+        super(Schedule.class, dslContext);
     }
 
     public void addScheduleId(List<ScheduleUpdateInformation> scheduleUpdateInformationList) {
@@ -46,16 +38,21 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
         return String.format("%s:%s", journeyId, stopId);
     }
 
-    private static class ScheduleRowMapper implements RowMapper<ch.bernmobil.vibe.shared.entitiy.Schedule> {
-        @Override
-        public ch.bernmobil.vibe.shared.entitiy.Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
-            UUID id = rs.getObject(ScheduleContract.ID, UUID.class);
-            String platform = rs.getString(ScheduleContract.PLATFORM);
-            Time plannedArrival = rs.getTime(ScheduleContract.PLANNED_ARRIVAL);
-            Time plannedDeparture = rs.getTime(ScheduleContract.PLANNED_DEPARTURE);
-            UUID stop = rs.getObject(ScheduleContract.STOP, UUID.class);
-            UUID journey = rs.getObject(ScheduleContract.JOURNEY, UUID.class);
-            return new Schedule(id, platform, plannedArrival, plannedDeparture, stop, journey);
-        }
+    @Override
+    protected Table<Record> getTable() {
+        return table(ScheduleContract.TABLE_NAME);
+    }
+
+    @Override
+    protected Collection<Field<?>> getFields() {
+        final String[] columnsToFetch = {ScheduleContract.ID, ScheduleContract.PLATFORM,
+            ScheduleContract.PLANNED_ARRIVAL, ScheduleContract.PLANNED_DEPARTURE,
+            ScheduleContract.STOP, ScheduleContract.JOURNEY};
+        return Arrays.stream(columnsToFetch).map(DSL::field).collect(toList());
+    }
+
+    @Override
+    protected Consumer<Schedule> getConsumer() {
+        return schedule -> getMappings().put(concatKey(schedule.getJourney(), schedule.getStop()), schedule);
     }
 }

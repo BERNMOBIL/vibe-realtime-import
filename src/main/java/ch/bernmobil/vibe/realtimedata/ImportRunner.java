@@ -1,35 +1,39 @@
 package ch.bernmobil.vibe.realtimedata;
 
-import ch.bernmobil.vibe.shared.UpdateHistoryEntry;
+import static java.util.stream.Collectors.toList;
+
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepository;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
+import ch.bernmobil.vibe.shared.UpdateHistoryEntry;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @EnableScheduling
@@ -71,10 +75,9 @@ public class ImportRunner {
      * 5. Populate the updateInformations with the not in the Feed containing scheduleId
      * 6. Convert updateInformations to concrete ScheduleUpdate Entity
      * 7. Save
-     * @throws Exception
      */
     @Scheduled(fixedDelay = 30 * 1000)
-    public void run() throws Exception {
+    public void run() {
         UpdateHistoryEntry lastSuccessUpdate = updateHistoryRepository.findLastSuccessUpdate();
         if(lastSuccessUpdate == null) {
             logger.warn("No successful update entry found - Realtime Update aborted");

@@ -1,56 +1,47 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import ch.bernmobil.vibe.shared.QueryBuilder;
-import ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
-import ch.bernmobil.vibe.shared.UpdateManager;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import javax.sql.DataSource;
+import static java.util.stream.Collectors.toList;
+import static org.jooq.impl.DSL.table;
 
 import ch.bernmobil.vibe.shared.contract.StopMapperContract;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Consumer;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 @Component
 public class StopMapperRepository extends BaseRepository<StopMapping> {
 
     @Autowired
-    public StopMapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
-        super(mapperDataSource, new StopMappingRowMapper());
+    public StopMapperRepository(@Qualifier("MapperDslContext")DSLContext dslContext) {
+        super(StopMapping.class, dslContext);
     }
 
     public Optional<StopMapping> findByGtfsId(String gtfsId) {
         return Optional.ofNullable(getMappings().get(gtfsId));
     }
 
-    public void load(Timestamp updateTimestamp) {
-        String query = new QueryBuilder()
-            .select(StopMapperContract.TABLE_NAME)
-            .where(Predicate.equals(StopMapperContract.UPDATE, String.format("'%s'", updateTimestamp)))
-            .getQuery();
-
-        super.load(query, stopMapping -> getMappings().put(stopMapping.getGtfsId(), stopMapping));
+    @Override
+    protected Table<Record> getTable() {
+        return table(StopMapperContract.TABLE_NAME);
     }
 
-    private static class StopMappingRowMapper implements RowMapper<StopMapping> {
-
-        @Override
-        public StopMapping mapRow(ResultSet rs, int rowNum) throws SQLException {
-            String gtfsId = rs.getString(StopMapperContract.GTFS_ID);
-            UUID id = rs.getObject(StopMapperContract.ID, UUID.class);
-            return new StopMapping(gtfsId, id);
-        }
+    @Override
+    protected Collection<Field<?>> getFields() {
+        final String[] columnsToFetch = {StopMapperContract.GTFS_ID, StopMapperContract.ID};
+        return Arrays.stream(columnsToFetch).map(DSL::field).collect(toList());
     }
 
+    protected Consumer<StopMapping> getConsumer() {
+        return stopMapping -> getMappings().put(stopMapping.getGtfsId(), stopMapping);
+    }
 }
