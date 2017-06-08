@@ -1,9 +1,7 @@
 package ch.bernmobil.vibe.realtimedata;
 
 
-import ch.bernmobil.vibe.mocks.mappings.tables.records.JourneyMapperRecord;
-import ch.bernmobil.vibe.mocks.mappings.tables.records.StopMapperRecord;
-import ch.bernmobil.vibe.mocks.static_.tables.records.ScheduleRecord;
+
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.JourneyMapperMockData;
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleMockData;
 import ch.bernmobil.vibe.realtimedata.repository.mock.data.StopMapperMockData;
@@ -11,6 +9,10 @@ import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import java.sql.SQLException;
 import java.util.List;
+
+import jooq.generated.entities.mappings.tables.records.JourneyMapperRecord;
+import jooq.generated.entities.mappings.tables.records.StopMapperRecord;
+import jooq.generated.entities.static_.tables.records.ScheduleRecord;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.SQLDialect;
@@ -19,9 +21,9 @@ import org.jooq.tools.jdbc.MockDataProvider;
 import org.jooq.tools.jdbc.MockExecuteContext;
 import org.jooq.tools.jdbc.MockResult;
 
-import static ch.bernmobil.vibe.mocks.mappings.Tables.STOP_MAPPER;
-import static ch.bernmobil.vibe.mocks.mappings.tables.JourneyMapper.JOURNEY_MAPPER;
-import static ch.bernmobil.vibe.mocks.static_.tables.Schedule.SCHEDULE;
+import static jooq.generated.entities.mappings.Tables.STOP_MAPPER;
+import static jooq.generated.entities.mappings.tables.JourneyMapper.JOURNEY_MAPPER;
+import static jooq.generated.entities.static_.tables.Schedule.SCHEDULE;
 
 
 public class MockProvider implements MockDataProvider {
