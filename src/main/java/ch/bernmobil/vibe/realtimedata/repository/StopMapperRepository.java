@@ -23,6 +23,9 @@ import static org.jooq.impl.DSL.table;
 
 /**
  * Database-Repository for accessing the {@link ch.bernmobile.vibe.mocks.mappings.tables.StopMapper}'s information's created on Static-Update.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
  */
 @Component
 public class StopMapperRepository extends BaseRepository<StopMapping> {

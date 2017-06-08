@@ -23,6 +23,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Database-Repository for accessing the {@link ch.bernmobile.vibe.mocks.mappings.tables.JourneyMapper}'s information's created on Static-Update.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
  */
 @Component
 public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {

@@ -15,6 +15,10 @@ import java.util.function.Consumer;
 
 /**
  * An abstract Class which defines the minimal functionality of a default repository
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
+ *
  * @param <T> The Type of the Entity handled by the repository
  */
 public abstract class BaseRepository<T> {

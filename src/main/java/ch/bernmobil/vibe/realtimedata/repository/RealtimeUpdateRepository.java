@@ -13,6 +13,9 @@ import java.util.List;
 
 /**
  * Repository for accessing the Realtime-Update-API
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
  */
 @Component
 public class RealtimeUpdateRepository {

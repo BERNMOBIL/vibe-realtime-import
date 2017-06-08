@@ -19,6 +19,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Database-Repository for accessing the {@link ScheduleUpdate}-information's.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
  */
 @Component
 public class ScheduleUpdateRepository {

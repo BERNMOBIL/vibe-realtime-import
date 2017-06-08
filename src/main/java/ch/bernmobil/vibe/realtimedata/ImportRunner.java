@@ -35,6 +35,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
+ */
 @Service
 @EnableScheduling
 public class ImportRunner {
@@ -68,12 +72,12 @@ public class ImportRunner {
     /**
      * Scheduled Task which imports all Realtime-Updates.
      * Processing-Steps:
-     * 1. Load all necessary information's (schedules, stopMappings, journeyMappings)
-     * 2. Delete old Updates
+     * 1. Load all necessary information's ({@link ch.bernmobil.vibe.shared.entitiy.Schedule}'s, {@link StopMapping}'s, {@link JourneyMapping}'s)
+     * 2. Delete old {@link ScheduleUpdate}^
      * 3. Load FeedEntities containing the Update Informations
-     * 4. Extract updateInformations from the FeedEntities
-     * 5. Populate the updateInformations with the not in the Feed containing scheduleId
-     * 6. Convert updateInformations to concrete ScheduleUpdate Entity
+     * 4. Extract {@link ScheduleUpdateInformation} from the {@link FeedEntity}'s
+     * 5. Populate the {@link ScheduleUpdateInformation} with the not in the Feed containing {@link ch.bernmobil.vibe.shared.entitiy.Schedule}-Id
+     * 6. Convert {@link ScheduleUpdateInformation} to concrete {@link ScheduleUpdate} Entity
      * 7. Save
      */
     @Scheduled(fixedDelay = 30 * 1000)
