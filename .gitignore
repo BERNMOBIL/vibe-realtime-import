@@ -61,4 +61,5 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 gradle.properties
+jooq.gradle
 /gtfs/

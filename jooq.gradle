@@ -1,3 +1,35 @@
+apply plugin: 'nu.studer.jooq'
+
+dependencies {
+    jooqRuntime 'postgresql:postgresql:9.1-901.jdbc4'
+    testCompile 'org.jooq:jooq'
+}
+def generatorName = 'org.jooq.util.DefaultGenerator'
+def generatorStrategy = { name = 'org.jooq.util.DefaultGeneratorStrategy' }
+def generatorDatabase = {
+    name = 'org.jooq.util.postgres.PostgresDatabase'
+    inputSchema = 'public'
+    forcedTypes {
+        forcedType {
+            name = 'varchar'
+            expression = '.*'
+            types = 'JSONB?'
+        }
+        forcedType {
+            name = 'varchar'
+            expression = '.*'
+            types = 'INET'
+        }
+    }
+}
+def generatorGenerate = {
+    relations = true
+    deprecated = false
+    records = true
+    immutablePojos = true
+    fluentSetters = true
+}
+
 jooq {
     version = '3.9.2'
     edition = 'OSS'
@@ -9,35 +41,13 @@ jooq {
             password = jooqStaticPassword
         }
         generator {
-            name = 'org.jooq.util.DefaultGenerator'
-            strategy {
-                name = 'org.jooq.util.DefaultGeneratorStrategy'
-            }
-            database {
-                name = 'org.jooq.util.postgres.PostgresDatabase'
-                inputSchema = 'public'
-                forcedTypes {
-                    forcedType {
-                        name = 'varchar'
-                        expression = '.*'
-                        types = 'JSONB?'
-                    }
-                    forcedType {
-                        name = 'varchar'
-                        expression = '.*'
-                        types = 'INET'
-                    }
-                }
-            }
-            generate {
-                relations = true
-                deprecated = false
-                records = true
-                immutablePojos = true
-                fluentSetters = true
-            }
+            name = generatorName
+            strategy generatorStrategy
+            database generatorDatabase
+            generate generatorGenerate
             target {
-                packageName = 'ch.bernmobile.vibe.mocks.static'
+                packageName = jooqStaticTargetPackage
+                directory = jooqStaticOutputDirectory
             }
         }
     }
@@ -50,35 +60,13 @@ jooq {
 
         }
         generator {
-            name = 'org.jooq.util.DefaultGenerator'
-            strategy {
-                name = 'org.jooq.util.DefaultGeneratorStrategy'
-            }
-            database {
-                name = 'org.jooq.util.postgres.PostgresDatabase'
-                inputSchema = 'public'
-                forcedTypes {
-                    forcedType {
-                        name = 'varchar'
-                        expression = '.*'
-                        types = 'JSONB?'
-                    }
-                    forcedType {
-                        name = 'varchar'
-                        expression = '.*'
-                        types = 'INET'
-                    }
-                }
-            }
-            generate {
-                relations = true
-                deprecated = false
-                records = true
-                immutablePojos = true
-                fluentSetters = true
-            }
+            name = generatorName
+            strategy generatorStrategy
+            database generatorDatabase
+            generate generatorGenerate
             target {
-                packageName = 'ch.bernmobile.vibe.mocks.mappings'
+                packageName = jooqMappingsTargetPackage
+                directory = jooqMappingsOutputDirectory
             }
         }
     }
