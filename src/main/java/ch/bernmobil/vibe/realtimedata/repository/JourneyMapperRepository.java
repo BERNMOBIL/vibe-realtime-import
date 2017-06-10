@@ -1,17 +1,7 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import static java.util.stream.Collectors.toList;
-import static org.jooq.impl.DSL.table;
-
 import ch.bernmobil.vibe.shared.contract.JourneyMapperContract;
-import ch.bernmobil.vibe.shared.entitiy.Schedule;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
-
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.function.Consumer;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -21,8 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import static java.util.stream.Collectors.toList;
+import static org.jooq.impl.DSL.table;
+
 /**
- * Database-Repository for accessing the {@link ch.bernmobile.vibe.mocks.mappings.tables.JourneyMapper}'s information's created on Static-Update.
+ * Database-Repository for accessing the {@link JourneyMapping}'s information's created on Static-Update.
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso

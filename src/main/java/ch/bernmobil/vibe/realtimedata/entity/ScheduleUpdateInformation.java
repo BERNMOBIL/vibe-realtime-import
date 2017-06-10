@@ -1,6 +1,6 @@
 package ch.bernmobil.vibe.realtimedata.entity;
 
-import ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entity.ScheduleUpdate;
 import java.sql.Time;
 import java.util.UUID;
 

@@ -1,6 +1,10 @@
-package ch.bernmobil.vibe.realtimedata.repository.mock.data;
+package ch.bernmobil.vibe.realtimedata.mockdata;
 
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
+import ch.bernmobil.vibe.shared.mockdata.JourneyMockData;
+import ch.bernmobil.vibe.shared.mockdata.ScheduleMockData;
+import ch.bernmobil.vibe.shared.mockdata.StopMockData;
+
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;

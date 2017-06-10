@@ -5,7 +5,7 @@ import static org.jooq.impl.DSL.table;
 
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
 import ch.bernmobil.vibe.shared.contract.ScheduleContract;
-import ch.bernmobil.vibe.shared.entitiy.Schedule;
+import ch.bernmobil.vibe.shared.entity.Schedule;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -33,14 +33,14 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
      * Constructs an instance using a {@link DSLContext}
      * @param dslContext Object of the JOOQ Query Builder to access the database
      */
-    public ScheduleRepository(@Qualifier("StaticDslContext")DSLContext dslContext) {
+    ScheduleRepository(@Qualifier("StaticDslContext")DSLContext dslContext) {
         super(Schedule.class, dslContext);
     }
 
     /**
      * Populates a {@link List} of {@link ScheduleUpdateInformation} with the corresponding {@link Schedule}-Id.
-     * The Schedule ID is fetched from the {@link Schedule}-Table using a {@link ch.bernmobil.vibe.shared.entitiy.Journey}-Id and {@link ch.bernmobil.vibe.shared.entitiy.Stop}-Id
-     * <p>Notice: The {@link Schedule}-Id is needed to match a {@link ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate} to the right {@link Schedule}</p>
+     * The Schedule ID is fetched from the {@link Schedule}-Table using a {@link ch.bernmobil.vibe.shared.entity.Journey}-Id and {@link ch.bernmobil.vibe.shared.entity.Stop}-Id
+     * <p>Notice: The {@link Schedule}-Id is needed to match a {@link ch.bernmobil.vibe.shared.entity.ScheduleUpdate} to the right {@link Schedule}</p>
      * <p>Notice: If a {@link Schedule} can not be found, it will be ignored</p>
      * @param scheduleUpdateInformationList to be populated by the {@link Schedule}-Id
      */
@@ -54,7 +54,7 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
     }
 
     /**
-     * Helper-Method used to create a unique Key for a {@link Schedule} using the {@link ch.bernmobil.vibe.shared.entitiy.Journey}-Id and {@link ch.bernmobil.vibe.shared.entitiy.Stop}-Id
+     * Helper-Method used to create a unique Key for a {@link Schedule} using the {@link ch.bernmobil.vibe.shared.entity.Journey}-Id and {@link ch.bernmobil.vibe.shared.entity.Stop}-Id
      * @param journeyId of a Schedule
      * @param stopId of a Schedule
      * @return created Key

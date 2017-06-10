@@ -2,9 +2,9 @@ package ch.bernmobil.vibe.realtimedata.repository;
 
 import ch.bernmobil.vibe.realtimedata.TestConfiguration;
 import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
-import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleMockData;
-import ch.bernmobil.vibe.realtimedata.repository.mock.data.ScheduleUpdateInformationMockData;
-import ch.bernmobil.vibe.shared.entitiy.Schedule;
+import ch.bernmobil.vibe.shared.mockdata.ScheduleMockData;
+import ch.bernmobil.vibe.realtimedata.mockdata.ScheduleUpdateInformationMockData;
+import ch.bernmobil.vibe.shared.entity.Schedule;
 import org.jooq.DSLContext;
 import org.junit.Assert;
 import org.junit.Before;

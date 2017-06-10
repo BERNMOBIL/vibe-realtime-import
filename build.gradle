@@ -65,7 +65,6 @@ dependencies {
     runtime 'org.xerial:sqlite-jdbc:3.16.1'
     runtime('org.postgresql:postgresql')
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.3.RELEASE'
-    testCompile group: 'org.powermock', name: 'powermock-mockito-release-full', version: '1.6.4'
 }
 
 

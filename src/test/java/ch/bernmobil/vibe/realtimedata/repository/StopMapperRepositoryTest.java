@@ -1,7 +1,7 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
 import ch.bernmobil.vibe.realtimedata.TestConfiguration;
-import ch.bernmobil.vibe.realtimedata.repository.mock.data.StopMapperMockData;
+import ch.bernmobil.vibe.shared.mockdata.StopMapperMockData;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import org.jooq.DSLContext;
 import org.junit.Assert;

@@ -4,8 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.table;
 
 import ch.bernmobil.vibe.shared.contract.ScheduleUpdateContract;
-import ch.bernmobil.vibe.shared.entitiy.Schedule;
-import ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entity.ScheduleUpdate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;

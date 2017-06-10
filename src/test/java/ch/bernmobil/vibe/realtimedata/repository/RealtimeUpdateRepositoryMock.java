@@ -2,11 +2,8 @@ package ch.bernmobil.vibe.realtimedata.repository;
 
 import static org.mockito.Mockito.when;
 
-import ch.bernmobil.vibe.realtimedata.repository.JourneyMapperRepository;
-import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
-import ch.bernmobil.vibe.realtimedata.repository.mock.data.JourneyMapperMockData;
+import ch.bernmobil.vibe.shared.mockdata.JourneyMapperMockData;
 import com.google.protobuf.TextFormat;
-import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.io.File;

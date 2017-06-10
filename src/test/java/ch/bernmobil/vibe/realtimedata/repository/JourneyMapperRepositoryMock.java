@@ -3,7 +3,7 @@ package ch.bernmobil.vibe.realtimedata.repository;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-import ch.bernmobil.vibe.realtimedata.repository.mock.data.JourneyMapperMockData;
+import ch.bernmobil.vibe.shared.mockdata.JourneyMapperMockData;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 
 

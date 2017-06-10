@@ -9,6 +9,7 @@ import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepositoryMock;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepositoryMock;
+import ch.bernmobil.vibe.shared.MockProvider;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;

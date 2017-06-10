@@ -8,9 +8,9 @@ import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleRepository;
 import ch.bernmobil.vibe.realtimedata.repository.ScheduleUpdateRepository;
 import ch.bernmobil.vibe.realtimedata.repository.StopMapperRepository;
-import ch.bernmobil.vibe.shared.UpdateHistoryEntry;
 import ch.bernmobil.vibe.shared.UpdateHistoryRepository;
-import ch.bernmobil.vibe.shared.entitiy.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entity.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entity.UpdateHistory;
 import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -72,17 +72,17 @@ public class ImportRunner {
     /**
      * Scheduled Task which imports all Realtime-Updates.
      * Processing-Steps:
-     * 1. Load all necessary information's ({@link ch.bernmobil.vibe.shared.entitiy.Schedule}'s, {@link StopMapping}'s, {@link JourneyMapping}'s)
+     * 1. Load all necessary information's ({@link ch.bernmobil.vibe.shared.entity.Schedule}'s, {@link StopMapping}'s, {@link JourneyMapping}'s)
      * 2. Delete old {@link ScheduleUpdate}^
      * 3. Load FeedEntities containing the Update Informations
      * 4. Extract {@link ScheduleUpdateInformation} from the {@link FeedEntity}'s
-     * 5. Populate the {@link ScheduleUpdateInformation} with the not in the Feed containing {@link ch.bernmobil.vibe.shared.entitiy.Schedule}-Id
+     * 5. Populate the {@link ScheduleUpdateInformation} with the not in the Feed containing {@link ch.bernmobil.vibe.shared.entity.Schedule}-Id
      * 6. Convert {@link ScheduleUpdateInformation} to concrete {@link ScheduleUpdate} Entity
      * 7. Save
      */
     @Scheduled(fixedDelay = 30 * 1000)
     public void run() {
-        UpdateHistoryEntry lastSuccessUpdate = updateHistoryRepository.findLastSuccessUpdate();
+        UpdateHistory lastSuccessUpdate = updateHistoryRepository.findLastSuccessUpdate();
         if(lastSuccessUpdate == null) {
             logger.warn("No successful update entry found - Realtime Update aborted");
             return;
