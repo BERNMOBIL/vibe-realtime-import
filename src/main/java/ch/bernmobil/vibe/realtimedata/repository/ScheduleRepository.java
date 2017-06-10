@@ -1,61 +1,97 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
-import ch.bernmobil.vibe.shared.QueryBuilder;
-import ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
-import ch.bernmobil.vibe.shared.contract.ScheduleContract;
-import ch.bernmobil.vibe.shared.entitiy.Schedule;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Component;
+import static java.util.stream.Collectors.toList;
+import static org.jooq.impl.DSL.table;
 
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
+import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdateInformation;
+import ch.bernmobil.vibe.shared.contract.ScheduleContract;
+import ch.bernmobil.vibe.shared.entity.Schedule;
+
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+/**
+ * Database-Repository for accessing the {@link Schedule}-information.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
+ */
 @Component
 public class ScheduleRepository extends BaseRepository<Schedule> {
-
-    public ScheduleRepository(@Qualifier("StaticDataSource") DataSource dataSource) {
-        super(dataSource, new ScheduleRowMapper());
+    /**
+     * Constructs an instance using a {@link DSLContext}
+     * @param dslContext Object of the JOOQ Query Builder to access the database
+     */
+    ScheduleRepository(@Qualifier("StaticDslContext")DSLContext dslContext) {
+        super(Schedule.class, dslContext);
     }
 
-    public void load(Timestamp updateTimestamp) {
-        String query = new QueryBuilder()
-            .select(ScheduleContract.TABLE_NAME)
-            .where(Predicate.equals(ScheduleContract.UPDATE, String.format("'%s'", updateTimestamp)))
-            .getQuery();
-        //TODO: document
-        super.load(query, schedule -> mappings.put(concatKey(schedule.getJourney(), schedule.getStop()), schedule));
-    }
-
+    /**
+     * Populates a {@link List} of {@link ScheduleUpdateInformation} with the corresponding {@link Schedule#id}.
+     * The Schedule ID is fetched from the {@link Schedule} table using a
+     * {@link ch.bernmobil.vibe.shared.entity.Journey#id} and {@link ch.bernmobil.vibe.shared.entity.Stop#id}
+     * <p>Notice: The {@link Schedule#id} is needed to match a {@link ch.bernmobil.vibe.shared.entity.ScheduleUpdate} to the right {@link Schedule}</p>
+     * <p>Notice: If a {@link Schedule} can not be found, it will be ignored</p>
+     * @param scheduleUpdateInformationList to be populated by the {@link Schedule#id}
+     */
     public void addScheduleId(List<ScheduleUpdateInformation> scheduleUpdateInformationList) {
         for(ScheduleUpdateInformation info : scheduleUpdateInformationList) {
-            Schedule schedule = mappings.get(concatKey(info.getJourneyId(), info.getStopId()));
+            Schedule schedule = getEntries().get(concatKey(info.getJourneyId(), info.getStopId()));
             if(schedule != null) {
                 info.setScheduleId(schedule.getId());
             }
         }
     }
 
+    /**
+     * Helper-Method used to create a unique Key for a {@link Schedule} using the {@link ch.bernmobil.vibe.shared.entity.Journey#id}
+     * and {@link ch.bernmobil.vibe.shared.entity.Stop#id}.
+     * @param journeyId of a schedule
+     * @param stopId of a schedule
+     * @return A concatenated key of a {@link ch.bernmobil.vibe.shared.entity.Journey#id} and a {@link ch.bernmobil.vibe.shared.entity.Stop#id}
+     */
     private static String concatKey(UUID journeyId, UUID stopId) {
         return String.format("%s:%s", journeyId, stopId);
     }
 
-    private static class ScheduleRowMapper implements RowMapper<ch.bernmobil.vibe.shared.entitiy.Schedule> {
-        @Override
-        public ch.bernmobil.vibe.shared.entitiy.Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
-            UUID id = rs.getObject(ScheduleContract.ID, UUID.class);
-            String platform = rs.getString(ScheduleContract.PLATFORM);
-            Time plannedArrival = rs.getTime(ScheduleContract.PLANNED_ARRIVAL);
-            Time plannedDeparture = rs.getTime(ScheduleContract.PLANNED_DEPARTURE);
-            UUID stop = rs.getObject(ScheduleContract.STOP, UUID.class);
-            UUID journey = rs.getObject(ScheduleContract.JOURNEY, UUID.class);
-            return new Schedule(id, platform, plannedArrival, plannedDeparture, stop, journey);
-        }
+    /**
+     * Hook for the {@link #load(Timestamp)} method using the "Template Method Pattern".
+     * @return Table used in a query executed with a Jooq {@link DSLContext}
+     */
+    @Override
+    protected Table<Record> getTable() {
+        return table(ScheduleContract.TABLE_NAME);
+    }
+
+    /**
+     * Hook for the {@link #load(Timestamp)}-Method using the "Template Method Pattern".
+     * @return Fields used in a query executed with a Jooq {@link DSLContext}
+     */
+    @Override
+    protected Collection<Field<Object>> getFields() {
+        final String[] columnsToFetch = {ScheduleContract.ID, ScheduleContract.PLATFORM,
+            ScheduleContract.PLANNED_ARRIVAL, ScheduleContract.PLANNED_DEPARTURE,
+            ScheduleContract.STOP, ScheduleContract.JOURNEY};
+        return Arrays.stream(columnsToFetch).map(DSL::field).collect(toList());
+    }
+
+    /**
+     * Hook for the {@link #load(Timestamp)}-Method using the "Template Method Pattern".
+     * @return {@link Consumer} used to save the loaded {@link Schedule}s from the {@link #load(Timestamp)} method
+     */
+    @Override
+    protected Consumer<Schedule> getConsumer() {
+        return schedule -> getEntries().put(concatKey(schedule.getJourney(), schedule.getStop()), schedule);
     }
 }

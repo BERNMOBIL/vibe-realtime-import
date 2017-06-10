@@ -1,58 +1,75 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import ch.bernmobil.vibe.shared.QueryBuilder;
-import ch.bernmobil.vibe.shared.QueryBuilder.Predicate;
-import ch.bernmobil.vibe.shared.UpdateManager;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import javax.sql.DataSource;
-
 import ch.bernmobil.vibe.shared.contract.StopMapperContract;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import static java.util.stream.Collectors.toList;
+import static org.jooq.impl.DSL.table;
+
+/**
+ * Database repository for accessing the {@link StopMapping}'s information created on Static-Update.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
+ */
 @Component
 public class StopMapperRepository extends BaseRepository<StopMapping> {
-
-
-
+    /**
+     * Constructs an instance using a {@link DSLContext}
+     * @param dslContext Object of the JOOQ Query Builder to access the database
+     */
     @Autowired
-    public StopMapperRepository(@Qualifier("MapperDataSource") DataSource mapperDataSource) {
-        super(mapperDataSource, new StopMappingRowMapper());
+    public StopMapperRepository(@Qualifier("MapperDslContext")DSLContext dslContext) {
+        super(StopMapping.class, dslContext);
     }
 
+    /**
+     * Search a already loaded {@link StopMapping} by its GTFS-Id
+     * @param gtfsId search-criteria
+     * @return {@link Optional} which may contain a {@link StopMapping}
+     */
     public Optional<StopMapping> findByGtfsId(String gtfsId) {
-        return Optional.ofNullable(mappings.get(gtfsId));
+        return Optional.ofNullable(getEntries().get(gtfsId));
     }
 
-    public void load(Timestamp updateTimestamp) {
-        String query = new QueryBuilder()
-            .select(StopMapperContract.TABLE_NAME)
-            .where(Predicate.equals(StopMapperContract.UPDATE, String.format("'%s'", updateTimestamp)))
-            .getQuery();
-
-        super.load(query, stopMapping -> mappings.put(stopMapping.getGtfsId(), stopMapping));
+    /**
+     * Hook for the {@link #load(Timestamp)} method using the "Template Method Pattern"
+     * @return Table used in a query executed with a Jooq {@link DSLContext}
+     */
+    @Override
+    protected Table<Record> getTable() {
+        return table(StopMapperContract.TABLE_NAME);
     }
 
-    private static class StopMappingRowMapper implements RowMapper<StopMapping> {
-
-        @Override
-        public StopMapping mapRow(ResultSet rs, int rowNum) throws SQLException {
-            String gtfsId = rs.getString(StopMapperContract.GTFS_ID);
-            UUID id = rs.getObject(StopMapperContract.ID, UUID.class);
-            return new StopMapping(gtfsId, id);
-        }
+    /**
+     * Hook for the {@link #load(Timestamp)}-Method using the Template Method Pattern
+     * @return Fields used in a query executed with a Jooq {@link DSLContext}
+     */
+    @Override
+    protected Collection<Field<Object>> getFields() {
+        final String[] columnsToFetch = {StopMapperContract.GTFS_ID, StopMapperContract.ID};
+        return Arrays.stream(columnsToFetch).map(DSL::field).collect(toList());
     }
 
+    /**
+     * Hook for the {@link #load(Timestamp)}-Method using the Template Method Pattern
+     * @return {@link Consumer} used to save the loaded {@link StopMapping}s from the {@link #load(Timestamp)}-Method
+     */
+    protected Consumer<StopMapping> getConsumer() {
+        return stopMapping -> getEntries().put(stopMapping.getGtfsId(), stopMapping);
+    }
 }

@@ -1,37 +1,62 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import ch.bernmobil.vibe.shared.QueryBuilder;
-import ch.bernmobil.vibe.shared.QueryBuilder.PreparedStatement;
+import static java.util.stream.Collectors.toList;
+import static org.jooq.impl.DSL.table;
+
 import ch.bernmobil.vibe.shared.contract.ScheduleUpdateContract;
-import ch.bernmobil.vibe.realtimedata.entity.ScheduleUpdate;
+import ch.bernmobil.vibe.shared.entity.ScheduleUpdate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
-import javax.sql.DataSource;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.InsertValuesStepN;
+import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Database-Repository for accessing the {@link ScheduleUpdate}-information.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
+ */
 @Component
 public class ScheduleUpdateRepository {
-    private final String insertQuery;
-    private final JdbcTemplate jdbcTemplate;
-
-    public ScheduleUpdateRepository(@Qualifier("StaticDataSource")DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        insertQuery = new PreparedStatement()
-            .Insert(ScheduleUpdateContract.TABLE_NAME, ScheduleUpdateContract.COLUMNS)
-            .getQuery();
+    private final DSLContext dslContext;
+    /**
+     * Constructs an instance using a {@link DSLContext}
+     * @param dslContext Object of the JOOQ Query Builder to access the database
+     */
+    public ScheduleUpdateRepository(@Qualifier("StaticDslContext")DSLContext dslContext) {
+        this.dslContext = dslContext;
     }
 
+    /**
+     * Saves a {@link Collection} of {@link ScheduleUpdate}'s to the database using a Jooq {@link DSLContext}
+     * <p>Notice: {@link DSLContext#batch(String)} is used since it performs better using it with the amount of data
+     * expected from a Realtime Feed.</p>
+     * @param scheduleUpdates {@link Collection} to be saved
+     */
     public void save(Collection<ScheduleUpdate> scheduleUpdates) {
-        for(ScheduleUpdate scheduleUpdate : scheduleUpdates) {
-            jdbcTemplate.update(insertQuery, UUID.randomUUID(), scheduleUpdate.getSchedule(),
-                scheduleUpdate.getActualArrival(), scheduleUpdate.getActualDeparture());
-        }
+        Collection<Field<?>> fields = Arrays.stream(ScheduleUpdateContract.COLUMNS).map(DSL::field).collect(toList());
+        Collection<InsertValuesStepN<Record>> insertStatements = scheduleUpdates
+            .stream()
+            .map(su -> dslContext.insertInto(table(ScheduleUpdateContract.TABLE_NAME), fields)
+                .values(DSL.val(UUID.randomUUID()),
+                        DSL.val(su.getSchedule()),
+                        DSL.val(su.getActualArrival()),
+                        DSL.val(su.getActualDeparture())))
+            .collect(toList());
+
+        dslContext.batch(insertStatements).execute();
     }
 
+    /**
+     * Deletes all {@link ScheduleUpdate}s from the database
+     */
     public void deleteAll() {
-        jdbcTemplate.update(new QueryBuilder().truncate(ScheduleUpdateContract.TABLE_NAME).getQuery());
+        dslContext.truncate(ScheduleUpdateContract.TABLE_NAME).execute();
     }
 }
