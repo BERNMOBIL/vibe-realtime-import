@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Database-Repository for accessing the {@link Schedule}-information's.
+ * Database-Repository for accessing the {@link Schedule}-information.
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
@@ -38,11 +38,12 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
     }
 
     /**
-     * Populates a {@link List} of {@link ScheduleUpdateInformation} with the corresponding {@link Schedule}-Id.
-     * The Schedule ID is fetched from the {@link Schedule}-Table using a {@link ch.bernmobil.vibe.shared.entity.Journey}-Id and {@link ch.bernmobil.vibe.shared.entity.Stop}-Id
-     * <p>Notice: The {@link Schedule}-Id is needed to match a {@link ch.bernmobil.vibe.shared.entity.ScheduleUpdate} to the right {@link Schedule}</p>
+     * Populates a {@link List} of {@link ScheduleUpdateInformation} with the corresponding {@link Schedule#id}.
+     * The Schedule ID is fetched from the {@link Schedule} table using a
+     * {@link ch.bernmobil.vibe.shared.entity.Journey#id} and {@link ch.bernmobil.vibe.shared.entity.Stop#id}
+     * <p>Notice: The {@link Schedule#id} is needed to match a {@link ch.bernmobil.vibe.shared.entity.ScheduleUpdate} to the right {@link Schedule}</p>
      * <p>Notice: If a {@link Schedule} can not be found, it will be ignored</p>
-     * @param scheduleUpdateInformationList to be populated by the {@link Schedule}-Id
+     * @param scheduleUpdateInformationList to be populated by the {@link Schedule#id}
      */
     public void addScheduleId(List<ScheduleUpdateInformation> scheduleUpdateInformationList) {
         for(ScheduleUpdateInformation info : scheduleUpdateInformationList) {
@@ -54,17 +55,18 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
     }
 
     /**
-     * Helper-Method used to create a unique Key for a {@link Schedule} using the {@link ch.bernmobil.vibe.shared.entity.Journey}-Id and {@link ch.bernmobil.vibe.shared.entity.Stop}-Id
-     * @param journeyId of a Schedule
-     * @param stopId of a Schedule
-     * @return created Key
+     * Helper-Method used to create a unique Key for a {@link Schedule} using the {@link ch.bernmobil.vibe.shared.entity.Journey#id}
+     * and {@link ch.bernmobil.vibe.shared.entity.Stop#id}.
+     * @param journeyId of a schedule
+     * @param stopId of a schedule
+     * @return A concatenated key of a {@link ch.bernmobil.vibe.shared.entity.Journey#id} and a {@link ch.bernmobil.vibe.shared.entity.Stop#id}
      */
     private static String concatKey(UUID journeyId, UUID stopId) {
         return String.format("%s:%s", journeyId, stopId);
     }
 
     /**
-     * Hook for the {@link #load(Timestamp)}-Method using the Template Method Pattern
+     * Hook for the {@link #load(Timestamp)} method using the "Template Method Pattern".
      * @return Table used in a query executed with a Jooq {@link DSLContext}
      */
     @Override
@@ -73,7 +75,7 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
     }
 
     /**
-     * Hook for the {@link #load(Timestamp)}-Method using the Template Method Pattern
+     * Hook for the {@link #load(Timestamp)}-Method using the "Template Method Pattern".
      * @return Fields used in a query executed with a Jooq {@link DSLContext}
      */
     @Override
@@ -85,8 +87,8 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
     }
 
     /**
-     * Hook for the {@link #load(Timestamp)}-Method using the Template Method Pattern
-     * @return {@link Consumer} used to save the loaded {@link Schedule}s from the {@link #load(Timestamp)}-Method
+     * Hook for the {@link #load(Timestamp)}-Method using the "Template Method Pattern".
+     * @return {@link Consumer} used to save the loaded {@link Schedule}s from the {@link #load(Timestamp)} method
      */
     @Override
     protected Consumer<Schedule> getConsumer() {

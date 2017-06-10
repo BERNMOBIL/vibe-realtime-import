@@ -21,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.table;
 
 /**
- * Database-Repository for accessing the {@link JourneyMapping}'s information's created on Static-Update.
+ * Database repository for accessing the {@link JourneyMapping}'s information created on Static-Update.
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
@@ -38,9 +38,9 @@ public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
     }
 
     /**
-     * Search a already loaded {@link JourneyMapping} by it's GTFS-Trip-Id
+     * Search an already loaded {@link JourneyMapping} by its GTFS-Trip-Id
      * @param gtfsTripId search-criteria
-     * @return May containing a found {@link JourneyMapping}
+     * @return {@link Optional} which may contain a {@link JourneyMapping}
      */
     public Optional<JourneyMapping> findByGtfsTripId(String gtfsTripId) {
         return Optional.ofNullable(getEntries().get(gtfsTripId));
@@ -67,8 +67,8 @@ public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
     }
 
     /**
-     * Hook for the {@link #load(Timestamp)}-Method using the Template Method Pattern
-     * @return {@link Consumer} used to save the loaded {@link JourneyMapping}s from the {@link #load(Timestamp)}-Method
+     * Hook for {@link #load(Timestamp)} using the "Template Method Pattern".
+     * @return {@link Consumer} used to save the loaded {@link JourneyMapping}s from {@link #load(Timestamp)},
      */
     @Override
     protected Consumer<JourneyMapping> getConsumer() {

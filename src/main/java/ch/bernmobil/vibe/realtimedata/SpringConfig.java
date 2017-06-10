@@ -63,7 +63,6 @@ public class SpringConfig {
     }
 
     @Bean
-    @Scope(BeanDefinition.SCOPE_SINGLETON)
     public UpdateTimestampManager updateTimestampManager(){
         return new UpdateTimestampManager();
     }

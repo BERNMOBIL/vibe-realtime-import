@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.table;
 
 /**
- * Database-Repository for accessing the {@link ch.bernmobile.vibe.mocks.mappings.tables.StopMapper}'s information's created on Static-Update.
+ * Database repository for accessing the {@link StopMapping}'s information created on Static-Update.
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
@@ -39,16 +39,16 @@ public class StopMapperRepository extends BaseRepository<StopMapping> {
     }
 
     /**
-     * Search a already loaded {@link StopMapping} by it's GTFS-Id
+     * Search a already loaded {@link StopMapping} by its GTFS-Id
      * @param gtfsId search-criteria
-     * @return May containing a found {@link StopMapping}
+     * @return {@link Optional} which may contain a {@link StopMapping}
      */
     public Optional<StopMapping> findByGtfsId(String gtfsId) {
         return Optional.ofNullable(getEntries().get(gtfsId));
     }
 
     /**
-     * Hook for the {@link #load(Timestamp)}-Method using the Template Method Pattern
+     * Hook for the {@link #load(Timestamp)} method using the "Template Method Pattern"
      * @return Table used in a query executed with a Jooq {@link DSLContext}
      */
     @Override

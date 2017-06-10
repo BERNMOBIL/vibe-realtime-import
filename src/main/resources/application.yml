@@ -20,3 +20,5 @@ bernmobil:
     timeout-duration: 30
   locale:
     timezone: Europe/Paris
+  import:
+    schedule: {30 * 1000}
