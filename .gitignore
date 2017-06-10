@@ -62,4 +62,5 @@ gradle-app.setting
 
 gradle.properties
 jooq.gradle
+jooq_DEACTIVATED_.gradle
 /gtfs/
