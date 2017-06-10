@@ -29,11 +29,6 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'docker'
 
-if (file('jooq.gradle').exists()) {
-    apply from: 'jooq.gradle'
-}
-
-
 jar {
     baseName = 'realtime-import'
     version = version
@@ -57,8 +52,6 @@ repositories {
     mavenCentral()
 }
 
-
-
 dependencies {
     compile group: 'com.google.transit', name: 'gtfs-realtime-bindings', version: '0.0.4'
     compile 'org.jooq:jooq'
@@ -69,3 +62,9 @@ dependencies {
     runtime('org.postgresql:postgresql')
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.3.RELEASE'
 }
+
+if (file('jooq.gradle').exists()) {
+    apply from: 'jooq.gradle'
+    project.tasks.getByName('compileJava').dependsOn -= 'generateSampleJooqSchemaSource'
+}
+

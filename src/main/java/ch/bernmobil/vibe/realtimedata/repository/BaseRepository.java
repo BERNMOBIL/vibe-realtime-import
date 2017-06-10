@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * An abstract Class which defines the minimal functionality of a default repository
+ * An abstract Class which defines minimal functionality of a default repository
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
@@ -39,11 +39,13 @@ public abstract class BaseRepository<T> {
     }
 
     /**
-     * Loads records from Database using the DSLContext, convert the records to Java POJO's and save them into {@link #entries} field
+     * Loads records from database using the {@link DSLContext}, convert the records to Java POJO's and save them into {@link #entries} field
      * The method uses three helpers to build the query:
-     * - {@link #getTable()}
-     * - {@link #getFields()}
-     * - {@link #getConsumer()}
+     * <ul>
+     *     <li>{@link #getTable()}</li>
+     *     <li>{@link #getFields()}</li>
+     *     <li>{@link #getConsumer()}</li>
+     * </ul>
      * @param updateTimestamp refers to the version of Data to Load
      */
     public void load(Timestamp updateTimestamp) {

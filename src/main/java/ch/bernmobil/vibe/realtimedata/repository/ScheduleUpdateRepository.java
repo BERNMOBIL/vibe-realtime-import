@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Database-Repository for accessing the {@link ScheduleUpdate}-information's.
+ * Database-Repository for accessing the {@link ScheduleUpdate}-information.
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
@@ -35,7 +35,8 @@ public class ScheduleUpdateRepository {
 
     /**
      * Saves a {@link Collection} of {@link ScheduleUpdate}'s to the database using a Jooq {@link DSLContext}
-     * <p>Notice: The {@link DSLContext} batch method is used because of the better performance</p>
+     * <p>Notice: {@link DSLContext#batch(String)} is used since it performs better using it with the amount of data
+     * expected from a Realtime Feed.</p>
      * @param scheduleUpdates {@link Collection} to be saved
      */
     public void save(Collection<ScheduleUpdate> scheduleUpdates) {
@@ -43,15 +44,17 @@ public class ScheduleUpdateRepository {
         Collection<InsertValuesStepN<Record>> insertStatements = scheduleUpdates
             .stream()
             .map(su -> dslContext.insertInto(table(ScheduleUpdateContract.TABLE_NAME), fields)
-                .values(DSL.val(UUID.randomUUID()),DSL.val(su.getSchedule()),
-                    DSL.val(su.getActualArrival()), DSL.val(su.getActualDeparture())))
+                .values(DSL.val(UUID.randomUUID()),
+                        DSL.val(su.getSchedule()),
+                        DSL.val(su.getActualArrival()),
+                        DSL.val(su.getActualDeparture())))
             .collect(toList());
 
         dslContext.batch(insertStatements).execute();
     }
 
     /**
-     * Deletes all {@link ScheduleUpdate}s from the Database
+     * Deletes all {@link ScheduleUpdate}s from the database
      */
     public void deleteAll() {
         dslContext.truncate(ScheduleUpdateContract.TABLE_NAME).execute();

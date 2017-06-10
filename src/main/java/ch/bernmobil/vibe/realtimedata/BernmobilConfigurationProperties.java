@@ -4,6 +4,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.net.URL;
 
+/**
+ * Class to define configuration properties and help the Spring Configuration Processor to determine the type and its
+ * converters for a custom property.
+ *
+ * @author Oliviero Chiodo
+ * @author Matteo Patisso
+ */
 public class BernmobilConfigurationProperties {
 
     @ConfigurationProperties(prefix = "bernmobil.mappingrepository.datasource")
@@ -78,11 +85,11 @@ public class BernmobilConfigurationProperties {
     @ConfigurationProperties(prefix = "bernmobil.history")
     public class History {
         /**
-         * Defines how many different import versions are stored in the database
+         * Defines how many different import versions of static data are stored in the database
          */
         private int size;
         /**
-         * Defines how long the realtime service in minutes
+         * Defines the amount of time, from when a running instance is considered as failed.
          */
         private long timeoutDuration;
 
@@ -118,6 +125,23 @@ public class BernmobilConfigurationProperties {
 
         public void setTimezone(String timezone) {
             this.timezone = timezone;
+        }
+    }
+
+    @ConfigurationProperties(prefix = "bernmobil.import")
+    public class Import {
+        /**
+         * Integer value in milliseconds for the delay between the end of a realtime import and the beginning of the
+         * next one.
+         */
+        private int schedule;
+
+        public int getSchedule() {
+            return schedule;
+        }
+
+        public void setSchedule(int schedule) {
+            this.schedule = schedule;
         }
     }
 }

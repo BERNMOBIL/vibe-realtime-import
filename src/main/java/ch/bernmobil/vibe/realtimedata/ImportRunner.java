@@ -36,6 +36,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 /**
+ * Class to configure the scheduled import task.
+ *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
  */
@@ -72,15 +74,17 @@ public class ImportRunner {
     /**
      * Scheduled Task which imports all Realtime-Updates.
      * Processing-Steps:
-     * 1. Load all necessary information's ({@link ch.bernmobil.vibe.shared.entity.Schedule}'s, {@link StopMapping}'s, {@link JourneyMapping}'s)
-     * 2. Delete old {@link ScheduleUpdate}^
-     * 3. Load FeedEntities containing the Update Informations
-     * 4. Extract {@link ScheduleUpdateInformation} from the {@link FeedEntity}'s
-     * 5. Populate the {@link ScheduleUpdateInformation} with the not in the Feed containing {@link ch.bernmobil.vibe.shared.entity.Schedule}-Id
-     * 6. Convert {@link ScheduleUpdateInformation} to concrete {@link ScheduleUpdate} Entity
-     * 7. Save
+     * <ol>
+     *     <li>Load all necessary information ({@link ch.bernmobil.vibe.shared.entity.Schedule}s, {@link StopMapping}s, {@link JourneyMapping}s)</li>
+     *     <li>Delete old {@link ScheduleUpdate}</li>
+     *     <li>Load FeedEntities containing the update information objects</li>
+     *     <li>Extract {@link ScheduleUpdateInformation} from the {@link FeedEntity}'s</li>
+     *     <li>Populate the {@link ScheduleUpdateInformation} with the not in the Feed containing {@link ch.bernmobil.vibe.shared.entity.Schedule#id}</li>
+     *     <li>Convert {@link ScheduleUpdateInformation} to concrete {@link ScheduleUpdate} entity</li>
+     *     <li>Save</li>
+     * </ol>
      */
-    @Scheduled(fixedDelay = 30 * 1000)
+    @Scheduled(fixedDelayString = "${bernmobil.import.schedule}")
     public void run() {
         UpdateHistory lastSuccessUpdate = updateHistoryRepository.findLastSuccessUpdate();
         if(lastSuccessUpdate == null) {
@@ -106,15 +110,17 @@ public class ImportRunner {
     }
 
     /**
-     * Extract the Information needed for the ScheduleUpdate from the protobuf-informations.
-     * The following Informations are extracted from the feedEntities:
-     * - tripId
-     * - stopId
-     * - actualArrivalTime
-     * - actualDepartureTime
-     * <p>Note: If information's can't be extracted, the stopTimeUpdate will be ignored.</p>
+     * Extract the Information needed for the ScheduleUpdate from the protobuf-information.
+     * The following information are extracted from the feedEntities:
+     * <ul>
+     *     <li>tripId</li>
+     *     <li>stopId</li>
+     *     <li>actualArrivalTime</li>
+     *     <li>actualDepartureTime</li>
+     * </ul>
+     * <p>Note: If information can't be extracted, the stopTimeUpdate will be ignored.</p>
      * @param feedEntities Realtime-Updates, parsed by com.google.transit library
-     * @return List of ScheduleUpdateInformation's containing the extracted Informations from the feedEntities
+     * @return List of ScheduleUpdateInformation containing the extracted information from the feedEntities
      */
     List<ScheduleUpdateInformation> extractScheduleUpdateInformation(List<FeedEntity> feedEntities) {
         List<ScheduleUpdateInformation> validStopTimeUpdates = new ArrayList<>();
@@ -140,9 +146,9 @@ public class ImportRunner {
     /**
      * Creates the ScheduleUpdateInformation Object from the stopTimeUpdate.
      * <p>Note: This is a help function and is used from the extractScheduleUpdateInformation method only</p>
-     * @param stopTimeUpdate containing the GTFS-Realtime information's
+     * @param stopTimeUpdate containing the GTFS-Realtime information
      * @param gtfsTripId corresponds to the tripId of the first parameter "stopTimeUpdate"
-     * @return ScheduleUpdateInformation object containing the informations of the stopTimeUpdate
+     * @return ScheduleUpdateInformation object containing the information of the stopTimeUpdate
      */
     ScheduleUpdateInformation convertToScheduleUpdateInformation(StopTimeUpdate stopTimeUpdate, String gtfsTripId) {
         String gtfsStopId = stopTimeUpdate.getStopId();
@@ -161,12 +167,12 @@ public class ImportRunner {
     /**
      * Converts scheduleUpdateInformation objects into valid ScheduleUpdate entities.
      * <p>Note: There can be only one single ScheduleUpdate by Schedule. If more than one exists, the last processed will be kept.</p>
-     * @param scheduleUpdateInformations A List of ScheduleUpdatesInformations to be converted to ScheduleUpdate
+     * @param scheduleUpdateInformationList A List of {@link ScheduleUpdateInformation} to be converted to ScheduleUpdate
      * @return ScheduleUpdates ready for saving to the Database
      */
-    Collection<ScheduleUpdate> convert(List<ScheduleUpdateInformation> scheduleUpdateInformations) {
+    Collection<ScheduleUpdate> convert(List<ScheduleUpdateInformation> scheduleUpdateInformationList) {
         Map<UUID, ScheduleUpdate> scheduleUpdates = new HashMap<>();
-        for(ScheduleUpdateInformation info : scheduleUpdateInformations) {
+        for(ScheduleUpdateInformation info : scheduleUpdateInformationList) {
             if(scheduleUpdates.containsKey(info.getScheduleId())) {
                 logger.warn(String.format("Schedule update with schedule-id %s already exists. It will overwrite any existing updates", info.getScheduleId()));
             }
@@ -176,10 +182,10 @@ public class ImportRunner {
     }
 
     /**
-     * Parses a timestamp (UTC-Time) to a sql.Time Object
+     * Parses UNIX-Time into {@link Time}
      * @param timestamp to convert
      * @param timezone to use while conversion
-     * @return sql.Time object in the passed timezone
+     * @return {@link Time} object in the passed timezone
      */
     static Time parseUpdateTime(Long timestamp, String timezone) {
         return timestamp == 0 ? null : Time.valueOf(

@@ -26,7 +26,7 @@ public class RealtimeUpdateRepository {
     private String realtimeUrl;
 
     /**
-     * Downloads the GTFS-Realtime Feeds and store it after parsing the downloaded protobuf-binary as {@link FeedMessage}
+     * Downloads the GTFS Realtime Feed entities and store it after parsing the downloaded protobuf-binary as {@link FeedMessage}
      * <p>Notice: The {@link com.google.transit.realtime.GtfsRealtime}-Library is used to convert the Feed-Messages</p>
      */
     private void loadFeedEntities() {
