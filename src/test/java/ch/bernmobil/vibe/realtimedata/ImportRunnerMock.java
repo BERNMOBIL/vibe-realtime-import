@@ -6,11 +6,13 @@ import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
 import ch.bernmobil.vibe.shared.mockdata.JourneyMapperMockData;
+import org.apache.log4j.Logger;
 import org.mockito.Mockito;
 
 
 public class ImportRunnerMock {
     ImportRunner mock;
+    Logger logger = Logger.getLogger(ImportRunnerMock.class);
 
     public ImportRunnerMock(){
         mock = Mockito.mock(ImportRunner.class);
@@ -25,7 +27,7 @@ public class ImportRunnerMock {
         try{
             doCallRealMethod().when(mock).run();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getStackTrace());
         }
 
 

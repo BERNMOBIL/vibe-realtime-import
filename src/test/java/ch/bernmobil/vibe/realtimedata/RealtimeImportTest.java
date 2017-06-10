@@ -34,10 +34,9 @@ public class RealtimeImportTest {
 
     private RealtimeUpdateRepository realtimeUpdateRepository;
     private ImportRunner importRunner;
-    private DSLContext dslContext;
 
     private boolean isFirstInitialization = true;
-    private static List<ScheduleUpdateInformation> mockedScheduleUpdateInformations;
+    private List<ScheduleUpdateInformation> mockedScheduleUpdateInformations;
 
     //BeforeClass executed before @Autowired
     @Before
@@ -152,11 +151,6 @@ public class RealtimeImportTest {
     @Autowired
     private void setRealtimeUpdateRepository(RealtimeUpdateRepository realtimeUpdateRepository) {
         this.realtimeUpdateRepository = realtimeUpdateRepository;
-    }
-
-    @Autowired
-    private void setMockedDslContext(DSLContext dslContext) {
-        this.dslContext = dslContext;
     }
 
     @Autowired

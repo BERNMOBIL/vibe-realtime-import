@@ -12,11 +12,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.mockito.Mockito;
 
 
 public class RealtimeUpdateRepositoryMock {
     RealtimeUpdateRepository mock;
+    Logger logger = Logger.getLogger(RealtimeUpdateRepositoryMock.class);
 
     public RealtimeUpdateRepositoryMock(){
         mock = Mockito.mock(RealtimeUpdateRepository.class);
@@ -38,7 +41,7 @@ public class RealtimeUpdateRepositoryMock {
             return builder.build().getEntityList();
         }
         catch(Exception e) {
-            e.printStackTrace();
+            logger.error(e.getStackTrace());
             return new ArrayList<>();
         }
     }

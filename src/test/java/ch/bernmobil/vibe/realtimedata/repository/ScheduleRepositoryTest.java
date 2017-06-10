@@ -30,7 +30,7 @@ public class ScheduleRepositoryTest {
     private DSLContext dslContext;
 
     private boolean isFirstInitialization = true;
-    private static List<ScheduleUpdateInformation> mockedScheduleUpdateInformationsWithoutScheduleId;
+    private List<ScheduleUpdateInformation> mockedScheduleUpdateInformationsWithoutScheduleId;
 
     //BeforeClass executed before @Autowired
     @Before
@@ -70,9 +70,9 @@ public class ScheduleRepositoryTest {
     @Test
     public void loadSchedulesTest() {
         final int expectedNumResults = 3;
-        ScheduleRepository scheduleRepository = new ScheduleRepository(dslContext);
-        scheduleRepository.load(new Timestamp(0));
-        Collection<Schedule> schedules = scheduleRepository.getEntries().values();
+        ScheduleRepository originalScheduleRepository = new ScheduleRepository(dslContext);
+        originalScheduleRepository.load(new Timestamp(0));
+        Collection<Schedule> schedules = originalScheduleRepository.getEntries().values();
         List<Schedule> sortedSchedules = schedules.stream().sorted(Comparator.comparing(Schedule::getId)).collect(toList());
         List<Schedule> expectedSchedules = ScheduleMockData.getDataSource().stream().sorted(Comparator.comparing(Schedule::getId)).collect(toList());
 

@@ -46,6 +46,7 @@ public class ScheduleUpdateInformationMockData {
         ScheduleMockData.getDataSource().get(2).getId(),
     };
 
+    private ScheduleUpdateInformationMockData() {}
 
     private static ScheduleUpdateInformation create(int index) {
         return new ScheduleUpdateInformation(actualArrivals[index], actualDepartures[index],
