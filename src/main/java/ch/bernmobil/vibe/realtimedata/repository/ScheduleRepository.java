@@ -77,7 +77,7 @@ public class ScheduleRepository extends BaseRepository<Schedule> {
      * @return Fields used in a query executed with a Jooq {@link DSLContext}
      */
     @Override
-    protected Collection<Field<?>> getFields() {
+    protected Collection<Field<Object>> getFields() {
         final String[] columnsToFetch = {ScheduleContract.ID, ScheduleContract.PLATFORM,
             ScheduleContract.PLANNED_ARRIVAL, ScheduleContract.PLANNED_DEPARTURE,
             ScheduleContract.STOP, ScheduleContract.JOURNEY};

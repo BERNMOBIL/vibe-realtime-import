@@ -3,12 +3,12 @@ package ch.bernmobil.vibe.realtimedata.repository;
 import java.util.List;
 import org.mockito.Mockito;
 
-public abstract class RepositoryMock<EntityType, RepositoryType> {
-    protected RepositoryType mock;
-    protected final List<EntityType> dataSource;
+public abstract class RepositoryMock<E, R> {
+    protected R mock;
+    protected final List<E> dataSource;
 
 
-    public RepositoryMock(Class<RepositoryType> classType, List<EntityType> dataSource){
+    public RepositoryMock(Class<R> classType, List<E> dataSource){
         mock = Mockito.mock(classType);
         this.dataSource = dataSource;
         configureMock();
@@ -17,7 +17,7 @@ public abstract class RepositoryMock<EntityType, RepositoryType> {
 
     protected abstract void configureMock();
 
-    public RepositoryType getMock() {
+    public R getMock() {
         return mock;
     }
 

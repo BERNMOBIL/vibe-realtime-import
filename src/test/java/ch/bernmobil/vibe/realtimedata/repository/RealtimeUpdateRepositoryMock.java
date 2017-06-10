@@ -1,11 +1,11 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
-import static org.mockito.Mockito.when;
-
-import ch.bernmobil.vibe.shared.mockdata.JourneyMapperMockData;
 import com.google.protobuf.TextFormat;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import org.apache.log4j.Logger;
+import org.mockito.Mockito;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -13,8 +13,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.when;
 
 
 public class RealtimeUpdateRepositoryMock {
@@ -41,7 +40,7 @@ public class RealtimeUpdateRepositoryMock {
             return builder.build().getEntityList();
         }
         catch(Exception e) {
-            logger.error(e.getStackTrace());
+            logger.error(e);
             return new ArrayList<>();
         }
     }

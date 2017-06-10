@@ -60,7 +60,7 @@ public class JourneyMapperRepository extends BaseRepository<JourneyMapping> {
      * @return Fields used in a query executed with a Jooq {@link DSLContext}
      */
     @Override
-    protected Collection<Field<?>> getFields() {
+    protected Collection<Field<Object>> getFields() {
         final String[] columnsToFetch = {JourneyMapperContract.GTFS_TRIP_ID,
             JourneyMapperContract.GTFS_SERVICE_ID, JourneyMapperContract.ID};
         return Arrays.stream(columnsToFetch).map(DSL::field).collect(toList());

@@ -1,13 +1,12 @@
 package ch.bernmobil.vibe.realtimedata;
 
+import org.apache.log4j.Logger;
+import org.mockito.Mockito;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
-
-import ch.bernmobil.vibe.shared.mockdata.JourneyMapperMockData;
-import org.apache.log4j.Logger;
-import org.mockito.Mockito;
 
 
 public class ImportRunnerMock {
@@ -27,7 +26,7 @@ public class ImportRunnerMock {
         try{
             doCallRealMethod().when(mock).run();
         } catch (Exception e) {
-            logger.error(e.getStackTrace());
+            logger.error(e);
         }
 
 

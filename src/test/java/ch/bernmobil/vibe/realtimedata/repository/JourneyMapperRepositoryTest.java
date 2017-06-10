@@ -51,9 +51,9 @@ public class JourneyMapperRepositoryTest {
     @Test
     public void loadJourneyMappingTest() {
         final int expectedNumResults = 3;
-        JourneyMapperRepository journeyMapperRepository = new JourneyMapperRepository(dslContext);
-        journeyMapperRepository.load(new Timestamp(0));
-        Collection<JourneyMapping> journeyMappings = journeyMapperRepository.getEntries().values();
+        JourneyMapperRepository originalJourneyMapperRepository = new JourneyMapperRepository(dslContext);
+        originalJourneyMapperRepository.load(new Timestamp(0));
+        Collection<JourneyMapping> journeyMappings = originalJourneyMapperRepository.getEntries().values();
         List<JourneyMapping> sortedJourneyMappings = journeyMappings.stream().sorted(Comparator.comparing(JourneyMapping::getId)).collect(toList());
         List<JourneyMapping> expectedJourneyMappings = JourneyMapperMockData.getDataSource().stream().sorted(Comparator.comparing(JourneyMapping::getId)).collect(toList());
 

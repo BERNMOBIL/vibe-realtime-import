@@ -6,7 +6,6 @@ import ch.bernmobil.vibe.realtimedata.repository.RealtimeUpdateRepository;
 import ch.bernmobil.vibe.shared.entity.ScheduleUpdate;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import org.jooq.DSLContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,10 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Time;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -89,25 +85,26 @@ public class RealtimeImportTest {
     @Test
     public void convertUpdateInformationsToScheduleUpdateTest() {
         //Sort has to be done, because the method convert disorder the elements.
-        final List<ScheduleUpdate> expectedScheduleUpdates = new ArrayList<ScheduleUpdate>(){{
-            add(new ScheduleUpdate(Time.valueOf(LocalTime.parse("14:00:00")),
-                Time.valueOf(LocalTime.parse("14:02:00")),
-                UUID.fromString("1b50cc76-83be-4aa0-bde9-74fc188a8978")));
-            add(new ScheduleUpdate(Time.valueOf(LocalTime.parse("13:14:15")),
-                Time.valueOf(LocalTime.parse("13:14:35")),
-                UUID.fromString("635977d7-28be-4cbc-833b-f817fbc47225")));
-            add(new ScheduleUpdate(Time.valueOf(LocalTime.parse("16:00:00")),
-                Time.valueOf(LocalTime.parse("16:07:00")),
-                UUID.fromString("86deb4f8-aaa3-4734-a772-1ee38f3e0344")));
-        }}.stream().sorted(Comparator.comparing(ScheduleUpdate::getSchedule)).collect(toList());
+        final ScheduleUpdate[] expectedScheduleUpdates = {
+                new ScheduleUpdate(Time.valueOf(LocalTime.parse("14:00:00")),
+                        Time.valueOf(LocalTime.parse("14:02:00")),
+                        UUID.fromString("1b50cc76-83be-4aa0-bde9-74fc188a8978")),
+                new ScheduleUpdate(Time.valueOf(LocalTime.parse("13:14:15")),
+                        Time.valueOf(LocalTime.parse("13:14:35")),
+                        UUID.fromString("635977d7-28be-4cbc-833b-f817fbc47225")),
+                new ScheduleUpdate(Time.valueOf(LocalTime.parse("16:00:00")),
+                        Time.valueOf(LocalTime.parse("16:07:00")),
+                        UUID.fromString("86deb4f8-aaa3-4734-a772-1ee38f3e0344"))
+        };
+        Arrays.sort(expectedScheduleUpdates, Comparator.comparing(ScheduleUpdate::getSchedule));
 
         List<ScheduleUpdateInformation> informations = new ArrayList<>(mockedScheduleUpdateInformations);
         List<ScheduleUpdate> sortedScheduleUpdates = importRunner.convert(informations).stream()
             .sorted(Comparator.comparing(ScheduleUpdate::getSchedule)).collect(toList());
 
         Assert.assertEquals(informations.size(), sortedScheduleUpdates.size());
-        for(int i = 0; i < expectedScheduleUpdates.size(); i++) {
-            ScheduleUpdate expected = expectedScheduleUpdates.get(i);
+        for(int i = 0; i < expectedScheduleUpdates.length; i++) {
+            ScheduleUpdate expected = expectedScheduleUpdates[i];
             ScheduleUpdate actual = sortedScheduleUpdates.get(i);
             Assert.assertEquals(expected.getActualArrival(), actual.getActualArrival());
             Assert.assertEquals(expected.getActualDeparture(), actual.getActualDeparture());

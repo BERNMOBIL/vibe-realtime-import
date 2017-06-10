@@ -42,7 +42,7 @@ public class ScheduleUpdateRepository {
         Collection<Field<?>> fields = Arrays.stream(ScheduleUpdateContract.COLUMNS).map(DSL::field).collect(toList());
         Collection<InsertValuesStepN<Record>> insertStatements = scheduleUpdates
             .stream()
-            .map((su) -> dslContext.insertInto(table(ScheduleUpdateContract.TABLE_NAME), fields)
+            .map(su -> dslContext.insertInto(table(ScheduleUpdateContract.TABLE_NAME), fields)
                 .values(DSL.val(UUID.randomUUID()),DSL.val(su.getSchedule()),
                     DSL.val(su.getActualArrival()), DSL.val(su.getActualDeparture())))
             .collect(toList());

@@ -50,9 +50,9 @@ public class StopMapperRepositoryTest {
     @Test
     public void loadStopMappingTest() {
         final int expectedNumResults = 3;
-        StopMapperRepository stopMapperRepository = new StopMapperRepository(dslContext);
-        stopMapperRepository.load(new Timestamp(0));
-        Collection<StopMapping> stopMappings = stopMapperRepository.getEntries().values();
+        StopMapperRepository originalStopMapperRepository = new StopMapperRepository(dslContext);
+        originalStopMapperRepository.load(new Timestamp(0));
+        Collection<StopMapping> stopMappings = originalStopMapperRepository.getEntries().values();
         List<StopMapping> sortedStopMappings = stopMappings.stream().sorted(Comparator.comparing(StopMapping::getId)).collect(toList());
         List<StopMapping> expectedStopMappings = StopMapperMockData.getDataSource().stream().sorted(Comparator.comparing(StopMapping::getId)).collect(toList());
 

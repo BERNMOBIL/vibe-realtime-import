@@ -1,7 +1,6 @@
 package ch.bernmobil.vibe.realtimedata.repository;
 
 import ch.bernmobil.vibe.shared.contract.StopMapperContract;
-import ch.bernmobil.vibe.shared.mapping.JourneyMapping;
 import ch.bernmobil.vibe.shared.mapping.StopMapping;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -22,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.table;
 
 /**
- * Database-Repository for accessing the {@link ch.bernmobile.vibe.mocks.mappings.tables.StopMapper}'s information's created on Static-Update.
+ * Database-Repository for accessing the {@link StopMapping}'s information's created on Static-Update.
  *
  * @author Oliviero Chiodo
  * @author Matteo Patisso
@@ -61,7 +60,7 @@ public class StopMapperRepository extends BaseRepository<StopMapping> {
      * @return Fields used in a query executed with a Jooq {@link DSLContext}
      */
     @Override
-    protected Collection<Field<?>> getFields() {
+    protected Collection<Field<Object>> getFields() {
         final String[] columnsToFetch = {StopMapperContract.GTFS_ID, StopMapperContract.ID};
         return Arrays.stream(columnsToFetch).map(DSL::field).collect(toList());
     }

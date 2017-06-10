@@ -67,7 +67,7 @@ public abstract class BaseRepository<T> {
      * Helper-Method for {@link #load(Timestamp)}
      * @return Any implementing method has to return the fields to load from the database
      */
-    protected abstract Collection<Field<?>> getFields();
+    protected abstract Collection<Field<Object>> getFields();
 
     /**
      * Helper-Method for {@link #load(Timestamp)}
