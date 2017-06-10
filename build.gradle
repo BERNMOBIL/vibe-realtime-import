@@ -2,7 +2,7 @@ group 'ch.bernmobil.vibe'
 version '1.0-SNAPSHOT'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '3.1'
+  gradleVersion = '3.3'
   distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
@@ -57,14 +57,15 @@ repositories {
     mavenCentral()
 }
 
+
+
 dependencies {
     compile group: 'com.google.transit', name: 'gtfs-realtime-bindings', version: '0.0.4'
-    //compile("org.springframework:spring-context:4.3.7.RELEASE")
+    compile 'org.jooq:jooq'
     compile project(':shared')
+    testCompile project(path: ':shared', configuration: 'testOutput')
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
     runtime 'org.xerial:sqlite-jdbc:3.16.1'
     runtime('org.postgresql:postgresql')
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.3.RELEASE'
 }
-
-
