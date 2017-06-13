@@ -21,4 +21,4 @@ bernmobil:
   locale:
     timezone: Europe/Paris
   import:
-    schedule: {30 * 1000}
+    schedule: 30000
